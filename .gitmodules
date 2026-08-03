@@ -1,0 +1,15 @@
+[submodule "Soup/Vendors/imgui"]
+	path = Soup/Vendors/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "Soup/Vendors/glfw"]
+	path = Soup/Vendors/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "Soup/Vendors/glm"]
+	path = Soup/Vendors/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "Soup/Vendors/spdlog"]
+	path = Soup/Vendors/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "Soup/Vendors/json"]
+	path = Soup/Vendors/json
+	url = https://github.com/nlohmann/json.git
