@@ -1,0 +1,4 @@
+---
+# Ignore vendors folder
+DisableFormat: true
+SortIncludes: Never
