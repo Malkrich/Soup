@@ -1,12 +1,29 @@
 set(sources)
 set(headers)
 
+# CLI
+set(cli_dir ${CMAKE_CURRENT_SOURCE_DIR}/CLI)
+list(APPEND public_includes ${cli_dir})
+
+list(APPEND sources
+    ${cli_dir}/CLIArguments.cpp
+    ${cli_dir}/CLICommands.cpp
+    ${cli_dir}/CLIConsole.cpp
+    ${cli_dir}/CLICore.cpp)
+
+list(APPEND headers
+    ${cli_dir}/CLIArguments.h
+    ${cli_dir}/CLICommands.h
+    ${cli_dir}/CLIConsole.h
+    ${cli_dir}/CLICore.h)
+
 # Core
 set(core_dir ${CMAKE_CURRENT_SOURCE_DIR}/Core)
 list(APPEND sources
 
     # Event
     ${core_dir}/Event/ApplicationEvent.h
+    ${core_dir}/Event/CLIEvent.h
     ${core_dir}/Event/Event.h
     ${core_dir}/Event/KeyEvent.h
     ${core_dir}/Event/MouseEvent.h
