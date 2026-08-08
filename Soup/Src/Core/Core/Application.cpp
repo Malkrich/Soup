@@ -11,38 +11,43 @@
 namespace Soup
 {
 
-  Application::Application()
+  Application::Application(const ApplicationSpecs& specs)
+    : m_Specs(specs)
   {
     SP_ASSERT(!s_Instance, "Application class is already instanciated !");
     s_Instance = this;
 
-    Renderer::Init();
-
-    // initialize Application
+    m_LayerStack = CreateScope<LayerStack>();
     Initialize();
   }
 
   Application::~Application()
   {
-    Renderer::Shutdown();
+    if (!m_Specs.Headless)
+    {
+      Renderer::Shutdown();
+    }
+    ApplicationLogger::Shutdown();
   }
 
   void Application::Initialize()
   {
-    // Window
-    Window::WindowSettings windowSettings;
-    windowSettings.Name = "Soup";
-    m_Window = CreateRef<Window>(windowSettings);
-    m_Window->SetEventCallbackFunction(SP_BIND_EVENT_FUNCTION(Application::OnEvent));
+    ApplicationLogger::Init();
 
-    // GUI
-    m_ImGuiLayer = CreateRef<ImGuiLayer>();
+    if (!m_Specs.Headless)
+    {
+      // Window
+      Window::WindowSettings windowSettings;
+      windowSettings.Name = "Soup";
+      m_Window = CreateRef<Window>(windowSettings);
+      m_Window->SetEventCallbackFunction(SP_BIND_EVENT_FUNCTION(Application::OnEvent));
 
-    // Layers
-    m_LayerStack = CreateScope<LayerStack>();
-    m_LayerStack->PushOverlay(m_ImGuiLayer);
+      Renderer::Init();
 
-    Renderer::InitAPI();
+      // GUI
+      m_ImGuiLayer = CreateRef<ImGuiLayer>();
+      m_LayerStack->PushOverlay(m_ImGuiLayer);
+    }
   }
 
   void Application::Run()
@@ -54,15 +59,27 @@ namespace Soup
       m_CurrentTime = time;
 
       for (auto layer : *m_LayerStack)
+      {
         layer->OnUpdate(dt);
+      }
 
-      m_ImGuiLayer->Begin();
-      for (auto layer : *m_LayerStack)
-        layer->OnGuiRender();
-      m_ImGuiLayer->End();
+      if (!m_Specs.Headless)
+      {
+        m_ImGuiLayer->Begin();
+        for (auto layer : *m_LayerStack)
+        {
+          layer->OnGuiRender();
+        }
+        m_ImGuiLayer->End();
 
-      m_Window->OnUpdate();
+        m_Window->OnUpdate();
+      }
     }
+  }
+
+  void Application::Quit()
+  {
+    m_Running = false;
   }
 
   void Application::OnEvent(Event& e)
@@ -80,9 +97,9 @@ namespace Soup
     dispatcher.Dispatch<WindowCloseEvent>(SP_BIND_EVENT_FUNCTION(Application::OnWindowClose));
   }
 
-  bool Application::OnWindowClose(const WindowCloseEvent& e)
+  bool Application::OnWindowClose(const WindowCloseEvent&)
   {
-    m_Running = false;
+    Quit();
     return true;
   }
 
