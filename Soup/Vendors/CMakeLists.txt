@@ -76,7 +76,7 @@ list(APPEND public_targets imguizmo)
 
 # json
 add_subdirectory(json)
-list(APPEND private_targets nlohmann_json)
+list(APPEND public_targets nlohmann_json)
 
 # spdlog
 add_subdirectory(spdlog)

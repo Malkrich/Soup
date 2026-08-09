@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Log/ApplicationLogger.h"
+
 #if defined(SP_WINDOWS)
 #define SP_DEBUG_BREAK __debugbreak()
 #elif defined(SP_LINUX)
@@ -9,6 +11,16 @@
 #error "SP_DEUG_BREAK not supported on this platform!"
 #endif
 
+#define SP_ASSERT_IMPL(condition, ...)                                                                                 \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    if (!(condition))                                                                                                  \
+    {                                                                                                                  \
+      SP_LOG_ERROR(__VA_ARGS__);                                                                                       \
+      SP_DEBUG_BREAK;                                                                                                  \
+    }                                                                                                                  \
+  } while (0)
+
 #define SP_CONCAT_INTERNAL(a, b) a##b
 #define SP_CONCAT(a, b) SP_CONCAT_INTERNAL(a, b)
 
@@ -17,17 +29,11 @@
 #define SP_STRUCT_PADDING(count) float SP_CONCAT(__padding_, __LINE__)[count] = {}
 
 #ifdef SP_DEBUG
-#define SP_ASSERT(condition, ...)                                                                                      \
-  do                                                                                                                   \
-  {                                                                                                                    \
-    if (!(condition))                                                                                                  \
-    {                                                                                                                  \
-      SP_LOG_ERROR(__VA_ARGS__);                                                                                       \
-      SP_DEBUG_BREAK;                                                                                                  \
-    }                                                                                                                  \
-  } while (false)
+#define SP_ASSERT(condition, ...) SP_ASSERT_IMPL(condition, __VA_ARGS__)
+#define SP_VERIFY(condition, ...) SP_ASSERT_IMPL(condition, __VA_ARGS__)
 #else
 #define SP_ASSERT(condition, ...)
+#define SP_VERIFY(condition, ...) SP_ASSERT_IMPL(condition, __VA_ARGS__)
 #endif
 
 #include <memory>

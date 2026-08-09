@@ -1,15 +1,37 @@
 set(sources)
 set(headers)
 
+# CLI
+set(cli_dir ${CMAKE_CURRENT_SOURCE_DIR}/CLI)
+list(APPEND public_includes ${cli_dir})
+
+list(APPEND sources
+    ${cli_dir}/CLIArguments.cpp
+    ${cli_dir}/CLICommands.cpp
+    ${cli_dir}/CLIConsole.cpp
+    ${cli_dir}/CLICore.cpp)
+
+list(APPEND headers
+    ${cli_dir}/CLIArguments.h
+    ${cli_dir}/CLICommands.h
+    ${cli_dir}/CLIConsole.h
+    ${cli_dir}/CLICore.h)
+
 # Core
 set(core_dir ${CMAKE_CURRENT_SOURCE_DIR}/Core)
 list(APPEND sources
 
     # Event
     ${core_dir}/Event/ApplicationEvent.h
+    ${core_dir}/Event/CLIEvent.h
     ${core_dir}/Event/Event.h
     ${core_dir}/Event/KeyEvent.h
     ${core_dir}/Event/MouseEvent.h
+
+    # Log
+    ${core_dir}/Log/ApplicationLogger.cpp
+    ${core_dir}/Log/LogCore.cpp
+    ${core_dir}/Log/Logger.cpp
 
     # Layer
     ${core_dir}/Layer/LayerStack.cpp
@@ -21,7 +43,6 @@ list(APPEND sources
     # Root
     ${core_dir}/Application.cpp
     ${core_dir}/Input.cpp
-    ${core_dir}/Log.cpp
     ${core_dir}/Time.cpp
     ${core_dir}/Window.cpp)
 
@@ -30,6 +51,11 @@ list(APPEND headers
     # Layer
     ${core_dir}/Layer/Layer.h
     ${core_dir}/Layer/LayerStack.h
+
+    # Log
+    ${core_dir}/Log/ApplicationLogger.h
+    ${core_dir}/Log/LogCore.h
+    ${core_dir}/Log/Logger.h
 
     # Memory
     ${core_dir}/Memory/Buffer.h
@@ -41,7 +67,6 @@ list(APPEND headers
     ${core_dir}/EntryPoint.h
     ${core_dir}/KeyCodes.h
     ${core_dir}/Input.h
-    ${core_dir}/Log.h
     ${core_dir}/Time.h
     ${core_dir}/Window.h)
 
