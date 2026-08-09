@@ -35,7 +35,9 @@ namespace Soup
     MouseScrolled,
 
     KeyPressed,
-    KeyReleased
+    KeyReleased,
+
+    CLICommandEnteredEvent
   };
 
   enum EventCategory : uint32_t
@@ -45,7 +47,8 @@ namespace Soup
     EventCategoryInput = 1 << 1,
     EventCategoryKeyboard = 1 << 2,
     EventCategoryMouse = 1 << 3,
-    EventCategoryMouseButton = 1 << 4
+    EventCategoryMouseButton = 1 << 4,
+    EventCategoryCLI = 1 << 5
   };
 
   class Event

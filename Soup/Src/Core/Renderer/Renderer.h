@@ -21,8 +21,6 @@ namespace Soup
     static void Init();
     static void Shutdown();
 
-    static void InitAPI();
-
     static RendererAPI::API GetCurrentAPI();
 
     // Read only

@@ -19,23 +19,6 @@ namespace Soup
   {
     // Shaders
     m_ShaderLib = CreateRef<ShaderLibrary>();
-    std::filesystem::path shaderBaseDir = "./data/Shaders/";
-    // Meshes
-    m_ShaderLib->Load(shaderBaseDir / "PBRMesh.glsl");
-    m_ShaderLib->Load(shaderBaseDir / "WireframeMesh.glsl");
-    m_ShaderLib->Load(shaderBaseDir / "PBRLegoMesh.glsl");
-    m_ShaderLib->Load(shaderBaseDir / "SolidLegoMesh.glsl");
-
-    // IBL
-    m_ShaderLib->Load(shaderBaseDir / "EquirectangularToCubemap.glsl");
-    m_ShaderLib->Load(shaderBaseDir / "IrradianceMap.glsl");
-    m_ShaderLib->Load(shaderBaseDir / "PreFilteredMap.glsl");
-    m_ShaderLib->Load(shaderBaseDir / "BrdfLUTMap.glsl");
-    m_ShaderLib->Load(shaderBaseDir / "Skybox.glsl");
-
-    // Misc
-    m_ShaderLib->Load(shaderBaseDir / "Light.glsl");
-    m_ShaderLib->Load(shaderBaseDir / "Line.glsl");
 
     // Full screen quad
     const std::vector<glm::vec2> fullScreenQuadVertices = { glm::vec2(-1.0f, -1.0f), glm::vec2(1.0f, -1.0f),

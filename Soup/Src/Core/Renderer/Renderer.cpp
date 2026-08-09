@@ -25,6 +25,8 @@ namespace Soup
         s_RendererData->RendererAPI = CreateRef<OpenGLRendererAPI>();
         break;
     }
+
+    s_RendererData->RendererAPI->Init();
   }
 
   void Renderer::Shutdown()
@@ -32,11 +34,6 @@ namespace Soup
     s_RendererData->RendererAPI->Shutdown();
     delete s_RendererData;
     s_RendererData = nullptr;
-  }
-
-  void Renderer::InitAPI()
-  {
-    s_RendererData->RendererAPI->Init();
   }
 
   RendererAPI::API Renderer::GetCurrentAPI()

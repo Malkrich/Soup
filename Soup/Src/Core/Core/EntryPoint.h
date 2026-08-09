@@ -2,14 +2,14 @@
 
 #include "Core/Application.h"
 
-extern Soup::Application* Soup::CreateApplication();
+extern Soup::Application* Soup::CreateApplication(int argc, char* argv[]);
 
-int main(int, char*[])
+int main(int argc, char* argv[])
 {
-  Soup::Log::Init();
+  Soup::Application* app = Soup::CreateApplication(argc, argv);
 
-  Soup::Application* app = Soup::CreateApplication();
   app->Run();
+
   delete app;
 
   return 0;

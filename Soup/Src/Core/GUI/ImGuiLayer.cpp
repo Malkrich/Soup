@@ -33,7 +33,7 @@ namespace Soup
     }
 
     // GLFW
-    GLFWwindow* window = (GLFWwindow*)Application::GetInstance()->GetWindow()->GetWindowHandle();
+    GLFWwindow* window = (GLFWwindow*)Application::GetInstance().GetWindow()->GetWindowHandle();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
@@ -69,8 +69,8 @@ namespace Soup
     ImGuizmo::BeginFrame();
 
     ImGuiIO& io = ImGui::GetIO();
-    const Application* app = Application::GetInstance();
-    io.DisplaySize = ImVec2((float)app->GetWindow()->GetWidth(), (float)app->GetWindow()->GetHeight());
+    const Application& app = Application::GetInstance();
+    io.DisplaySize = ImVec2((float)app.GetWindow()->GetWidth(), (float)app.GetWindow()->GetHeight());
 
     float time = (float)glfwGetTime();
     io.DeltaTime = m_Time > 0.0f ? (time - m_Time) : (1.0f / 60.0f);
@@ -85,7 +85,7 @@ namespace Soup
     ImGuiIO& io = ImGui::GetIO();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
-      GLFWwindow* window = (GLFWwindow*)Application::GetInstance()->GetWindow()->GetWindowHandle();
+      GLFWwindow* window = (GLFWwindow*)Application::GetInstance().GetWindow()->GetWindowHandle();
       ImGui::UpdatePlatformWindows();
       ImGui::RenderPlatformWindowsDefault();
       glfwMakeContextCurrent(window);
