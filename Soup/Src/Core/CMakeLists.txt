@@ -87,6 +87,17 @@ list(APPEND sources
 list(APPEND headers
     ${gui_dir}/ImGuiLayer.h)
 
+# IO
+set(io_dir ${CMAKE_CURRENT_SOURCE_DIR}/IO)
+list(APPEND headers
+    ${io_dir}/MeshImporter.h
+    ${io_dir}/MeshReader.h
+    ${io_dir}/ObjMeshReader.h)
+
+list(APPEND sources
+    ${io_dir}/MeshImporter.cpp
+    ${io_dir}/ObjMeshReader.cpp)
+
 # Metric
 set(metric_dir ${CMAKE_CURRENT_SOURCE_DIR}/Metric)
 list(APPEND headers
