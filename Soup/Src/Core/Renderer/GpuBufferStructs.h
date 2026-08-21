@@ -36,7 +36,7 @@ namespace Soup
     }
   };
 
-  struct LegoPartInstanceVertex
+  struct InstanceVertex
   {
     int EntityID = -1;
     RendererMaterial Material;
@@ -53,6 +53,7 @@ namespace Soup
     glm::mat4 View;
     glm::mat4 Projection;
     glm::vec3 Position;
+    SP_STRUCT_PADDING(1);
   };
 
   // Geometry

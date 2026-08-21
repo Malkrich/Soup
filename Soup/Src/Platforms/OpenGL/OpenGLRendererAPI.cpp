@@ -75,7 +75,7 @@ namespace Soup
   {
     PipelineSpecifications pipelineSpecs;
     pipelineSpecs.GeometryLayout = { { "a_Position", BufferElementType::Float2 } };
-    pipelineSpecs.Shader = fullScreenQuadShader;
+    pipelineSpecs.ShaderProgram = fullScreenQuadShader;
     Ref<OpenGLPipeline> pipeline = CreateRef<OpenGLPipeline>(pipelineSpecs);
 
     FrameBufferSpecifications frameBufferSpecs;
@@ -87,8 +87,8 @@ namespace Soup
 
     RenderPassSpecifications renderPassSpecs;
     renderPassSpecs.Name = "FullScreenQuadPass";
-    renderPassSpecs.FrameBuffer = frameBuffer;
-    renderPassSpecs.Pipeline = pipeline;
+    renderPassSpecs.FrameBufferObject = frameBuffer;
+    renderPassSpecs.PipelineObject = pipeline;
     Ref<RenderPass> fullScreenQuadRenderPass = RenderPass::Create(renderPassSpecs);
 
     pipeline->SetInputAssembly(m_FullScreenQuad->GetGeometryVertexBuffer(), m_FullScreenQuad->GetGeometryIndexBuffer());
@@ -243,7 +243,7 @@ namespace Soup
     {
       PipelineSpecifications pipelineSpecs;
       pipelineSpecs.GeometryLayout = { { "a_Position", BufferElementType::Float3 } };
-      pipelineSpecs.Shader = m_ShaderLib->Get("EquirectangularToCubemap");
+      pipelineSpecs.ShaderProgram = m_ShaderLib->Get("EquirectangularToCubemap");
       pipelineSpecs.DepthFunction = DepthFunctionMode::LessOrEqual;
       Ref<Pipeline> pipeline = Pipeline::Create(pipelineSpecs);
 
@@ -259,8 +259,8 @@ namespace Soup
 
       RenderPassSpecifications renderPassSpecs;
       renderPassSpecs.Name = "CubemapRenderPass";
-      renderPassSpecs.Pipeline = pipeline;
-      renderPassSpecs.FrameBuffer = cubemapFacesFrameBuffer;
+      renderPassSpecs.PipelineObject = pipeline;
+      renderPassSpecs.FrameBufferObject = cubemapFacesFrameBuffer;
       cubemapFacesRenderPass = RenderPass::Create(renderPassSpecs);
     }
 
@@ -282,7 +282,7 @@ namespace Soup
       cubemapFacesRenderPass->SetInput(0, environment.EnvironmentMap);
       cubemapFacesRenderPass->SetInput("u_EnvironmentCreateInfo", environmentCreateInfoUbo);
       Ref<Shader> irradianceMapShader = m_ShaderLib->Get("IrradianceMap");
-      cubemapFacesRenderPass->GetPipeline()->GetSpecifications().Shader = irradianceMapShader;
+      cubemapFacesRenderPass->GetPipeline()->GetSpecifications().ShaderProgram = irradianceMapShader;
 
       RenderCubemapPass(cubemapFacesRenderPass, cubemapCameraUbo);
 
@@ -295,7 +295,7 @@ namespace Soup
       cubemapFacesRenderPass->GetFrameBuffer()->Resize(environmentCreateInfo.PreFilteredMapDimXY);
 
       Ref<Shader> preFilteredMapShader = m_ShaderLib->Get("PreFilteredMap");
-      cubemapFacesRenderPass->GetPipeline()->GetSpecifications().Shader = preFilteredMapShader;
+      cubemapFacesRenderPass->GetPipeline()->GetSpecifications().ShaderProgram = preFilteredMapShader;
 
       RenderPreFilteredCreatePass(cubemapFacesRenderPass, cubemapCameraUbo, preFilteredCreateInfosUbo);
     }

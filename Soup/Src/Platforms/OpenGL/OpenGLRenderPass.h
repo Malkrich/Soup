@@ -3,8 +3,6 @@
 #include "Renderer/RenderPass.h"
 
 #include "OpenGLShaderStorageBuffer.h"
-#include "OpenGLTexture2D.h"
-#include "OpenGLTextureCubemap.h"
 #include "OpenGLUniformBuffer.h"
 
 namespace Soup
@@ -18,8 +16,8 @@ namespace Soup
     virtual void Begin() override;
     virtual void End() override;
 
-    virtual Ref<FrameBuffer> GetFrameBuffer() override { return m_Specs.FrameBuffer; }
-    virtual Ref<Pipeline> GetPipeline() override { return m_Specs.Pipeline; }
+    virtual Ref<FrameBuffer> GetFrameBuffer() override { return m_Specs.FrameBufferObject; }
+    virtual Ref<Pipeline> GetPipeline() override { return m_Specs.PipelineObject; }
 
     virtual void RemoveUniformInput(const std::string& name) override;
 

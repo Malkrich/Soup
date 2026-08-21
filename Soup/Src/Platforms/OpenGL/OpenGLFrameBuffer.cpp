@@ -235,7 +235,7 @@ namespace Soup
         case TextureFormat::Depth24Sentil8:
         {
           float depthValue = 1.0f;
-          glClearTexImage(m_DepthAttachment, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, &depthValue);
+          glClearTexImage(m_DepthAttachment, 0, GL_DEPTH_STENCIL, GL_FLOAT_32_UNSIGNED_INT_24_8_REV, &depthValue);
           break;
         }
         default:

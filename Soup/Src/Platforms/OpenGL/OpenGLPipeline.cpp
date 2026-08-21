@@ -8,15 +8,15 @@ namespace Soup
   namespace Utils
   {
 
-    static GLenum InternalPolygonModeToOpenGLPolygonMode(PolygoneMode mode)
+    static GLenum InternalPolygonModeToOpenGLPolygonMode(PolygonMode mode)
     {
       switch (mode)
       {
-        case PolygoneMode::Fill:
+        case PolygonMode::Fill:
           return GL_FILL;
-        case PolygoneMode::Line:
+        case PolygonMode::Line:
           return GL_LINE;
-        case PolygoneMode::Point:
+        case PolygonMode::Point:
           return GL_POINT;
       }
 
@@ -58,6 +58,8 @@ namespace Soup
     {
       switch (function)
       {
+        case DepthFunctionMode::Always:
+          return GL_ALWAYS;
         case DepthFunctionMode::Less:
           return GL_LESS;
         case DepthFunctionMode::LessOrEqual:
@@ -108,13 +110,13 @@ namespace Soup
   void OpenGLPipeline::Bind(uint32_t viewportWidth, uint32_t viewportHeight)
   {
     // Shader
-    m_Specs.Shader->Bind();
+    m_Specs.ShaderProgram->Bind();
 
     // Viewport and scissors
     SetViewport(0, 0, viewportWidth, viewportHeight);
 
     // Geoemtry
-    SetPolygonMode(m_Specs.Polygone);
+    SetPolygonMode(m_Specs.Polygon);
     EnableFaceCulling(m_Specs.EnableFaceCulling);
     SetFaceCullingMode(m_Specs.FaceCulling);
     SetFaceWindingMode(m_Specs.FaceWinding);
@@ -158,7 +160,7 @@ namespace Soup
     glViewport(x, y, width, height);
   }
 
-  void OpenGLPipeline::SetPolygonMode(PolygoneMode mode)
+  void OpenGLPipeline::SetPolygonMode(PolygonMode mode)
   {
     GLenum glMode = Utils::InternalPolygonModeToOpenGLPolygonMode(mode);
     glPolygonMode(GL_FRONT_AND_BACK, glMode);
