@@ -13,3 +13,6 @@
 [submodule "Soup/Vendors/json"]
 	path = Soup/Vendors/json
 	url = https://github.com/nlohmann/json.git
+[submodule "Soup/Vendors/tinyobjloader"]
+	path = Soup/Vendors/tinyobjloader
+	url = https://github.com/tinyobjloader/tinyobjloader.git
