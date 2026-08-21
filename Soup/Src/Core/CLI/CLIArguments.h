@@ -230,14 +230,11 @@ namespace Soup
   class CLIPositionalArgsIterator
   {
   public:
-    using ValueType = int;
-
-  private:
-    using InternalIteratorType = std::vector<int>::iterator;
+    using ValueType = size_t;
 
   public:
-    const ValueType& operator*() const { return *m_It; }
-    const ValueType* operator->() const { return m_It._Ptr; }
+    const ValueType& operator*() const { return m_It; }
+    const ValueType* operator->() const { return &m_It; }
 
     // Prefix increment
     CLIPositionalArgsIterator& operator++()
@@ -264,13 +261,13 @@ namespace Soup
     }
 
   private:
-    CLIPositionalArgsIterator(const InternalIteratorType& it)
-      : m_It(it)
+    CLIPositionalArgsIterator(int itValue)
+      : m_It(itValue)
     {
     }
 
   private:
-    InternalIteratorType m_It;
+    size_t m_It;
 
     friend class CLIPositionalArgRange;
   };
@@ -279,19 +276,15 @@ namespace Soup
   {
   public:
     CLIPositionalArgRange(const std::vector<CLIArgumentSpecs>& args)
+      : m_PositionalArgCount(args.size())
     {
-      m_Args.resize(args.size());
-      for (uint32_t i = 0; i < args.size(); i++)
-      {
-        m_Args[i] = i;
-      }
     }
 
-    CLIPositionalArgsIterator begin() { return CLIPositionalArgsIterator(m_Args.begin()); }
-    CLIPositionalArgsIterator end() { return CLIPositionalArgsIterator(m_Args.end()); }
+    CLIPositionalArgsIterator begin() { return CLIPositionalArgsIterator(0); }
+    CLIPositionalArgsIterator end() { return CLIPositionalArgsIterator(m_PositionalArgCount); }
 
   private:
-    std::vector<int> m_Args;
+    size_t m_PositionalArgCount;
   };
 
   class CLIFlaggedArgIterator

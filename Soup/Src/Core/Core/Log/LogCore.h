@@ -9,6 +9,8 @@ namespace Soup
 
   enum class LogColor
   {
+    Default = 0, // Reset
+
     White,
     Black,
 
