@@ -171,10 +171,12 @@ list(APPEND headers
 # Utils
 set(utils_dir ${CMAKE_CURRENT_SOURCE_DIR}/Utils)
 list(APPEND sources
+    ${utils_dir}/FileUtils.cpp
     ${utils_dir}/MathUtils.cpp
     ${utils_dir}/StringUtils.cpp)
 
 list(APPEND headers
+    ${utils_dir}/FileUtils.h
     ${utils_dir}/MathUtils.h
     ${utils_dir}/StringUtils.h)
 
