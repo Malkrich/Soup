@@ -12,7 +12,6 @@ namespace Soup
   {
   public:
     virtual void Init() override;
-    virtual void Shutdown() override {}
 
     virtual API GetAPI() const override { return API::OpenGL; }
 

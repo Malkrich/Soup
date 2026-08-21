@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Scene.h"
+#include <Scene/Scene.h>
 
 #include <entt.hpp>
 
@@ -32,18 +32,18 @@ namespace Soup
       return m_Scene->m_Registry.all_of<T>(m_EntityHandle);
     }
 
-    operator entt::entity() const { return m_EntityHandle; }
     operator uint32_t() const { return (uint32_t)m_EntityHandle; }
     operator bool() const { return m_EntityHandle != entt::null && m_Scene != nullptr; }
 
   private:
-    Entity(entt::entity handle, SceneRegistry* scene);
+    Entity(entt::entity handle, Scene* scene);
+    operator entt::entity() const { return m_EntityHandle; }
 
   private:
     entt::entity m_EntityHandle = entt::null;
-    SceneRegistry* m_Scene = nullptr;
+    Scene* m_Scene = nullptr;
 
-    friend class SceneRegistry;
+    friend class Scene;
   };
 
 }

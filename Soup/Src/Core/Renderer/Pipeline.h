@@ -7,7 +7,7 @@
 namespace Soup
 {
 
-  enum class PolygoneMode
+  enum class PolygonMode
   {
     Fill,
     Line,
@@ -29,6 +29,7 @@ namespace Soup
 
   enum class DepthFunctionMode
   {
+    Always,
     Less,
     LessOrEqual
   };
@@ -44,9 +45,9 @@ namespace Soup
     // ---------------------------------------------
     // -------------- Pipeline config --------------
     // ---------------------------------------------
-    Ref<Shader> Shader = nullptr;
+    Ref<Shader> ShaderProgram = nullptr;
     // Geometry
-    PolygoneMode Polygone = PolygoneMode::Fill;
+    PolygonMode Polygon = PolygonMode::Fill;
     bool EnableFaceCulling = true;
     FaceCullingMode FaceCulling = FaceCullingMode::Back;
     FaceWindingMode FaceWinding = FaceWindingMode::CounterClockwise;
@@ -64,6 +65,8 @@ namespace Soup
   {
   public:
     static Ref<Pipeline> Create(const PipelineSpecifications& specs);
+
+    virtual ~Pipeline() = default;
 
     virtual PipelineSpecifications& GetSpecifications() = 0;
 

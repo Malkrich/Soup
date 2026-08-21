@@ -7,31 +7,35 @@ namespace Soup
 
   struct RendererData
   {
-    RendererAPI::API RendererAPIType = RendererAPI::API::OpenGL;
-    Ref<RendererAPI> RendererAPI = nullptr;
+    RendererAPI::API RendererAPIType = RendererAPI::API::None;
+    Ref<RendererAPI> RendererAPIInstance = nullptr;
   };
 
   static RendererData* s_RendererData;
 
-  void Renderer::Init()
+  void Renderer::Init(RendererAPI::API api)
   {
     s_RendererData = new RendererData();
+    s_RendererData->RendererAPIType = api;
+  }
+
+  void Renderer::InitAPI()
+  {
     switch (s_RendererData->RendererAPIType)
     {
       case RendererAPI::API::None:
-        break;
         SP_ASSERT(false, "RendererAPI::API::None is not implemented yey!");
+        break;
       case RendererAPI::API::OpenGL:
-        s_RendererData->RendererAPI = CreateRef<OpenGLRendererAPI>();
+        s_RendererData->RendererAPIInstance = CreateRef<OpenGLRendererAPI>();
         break;
     }
 
-    s_RendererData->RendererAPI->Init();
+    s_RendererData->RendererAPIInstance->Init();
   }
 
   void Renderer::Shutdown()
   {
-    s_RendererData->RendererAPI->Shutdown();
     delete s_RendererData;
     s_RendererData = nullptr;
   }
@@ -43,49 +47,49 @@ namespace Soup
 
   Ref<ShaderLibrary> Renderer::GetShaderLibrary()
   {
-    return s_RendererData->RendererAPI->GetShaderLibrary();
+    return s_RendererData->RendererAPIInstance->GetShaderLibrary();
   }
 
   void Renderer::BeginRenderPass(Ref<RenderPass> renderPass)
   {
-    s_RendererData->RendererAPI->BeginRenderPass(renderPass);
+    s_RendererData->RendererAPIInstance->BeginRenderPass(renderPass);
   }
 
   void Renderer::EndRenderPass()
   {
-    s_RendererData->RendererAPI->EndRenderPass();
+    s_RendererData->RendererAPIInstance->EndRenderPass();
   }
 
   RendererEnvironment Renderer::CreateEnvironment(
     Ref<Texture2D> hdriTexture, const EnvironmentCreateInfo& environmentCreateInfo)
   {
-    return s_RendererData->RendererAPI->CreateEnvironment(hdriTexture, environmentCreateInfo);
+    return s_RendererData->RendererAPIInstance->CreateEnvironment(hdriTexture, environmentCreateInfo);
   }
 
   void Renderer::RenderSkybox(Ref<TextureCubemap> skyboxTexture)
   {
-    s_RendererData->RendererAPI->RenderSkybox(skyboxTexture);
+    s_RendererData->RendererAPIInstance->RenderSkybox(skyboxTexture);
   }
 
   void Renderer::RenderMesh(
     const Ref<GpuMesh>& mesh, Ref<UniformBuffer> meshDataUbo, Ref<UniformBuffer> materialDataUbo)
   {
-    s_RendererData->RendererAPI->RenderMesh(mesh, meshDataUbo, materialDataUbo);
+    s_RendererData->RendererAPIInstance->RenderMesh(mesh, meshDataUbo, materialDataUbo);
   }
 
   void Renderer::RenderMeshInstances(Ref<GpuMesh> mesh, Ref<VertexBuffer> instanceVertexBuffer, uint32_t instanceCount)
   {
-    s_RendererData->RendererAPI->RenderMeshInstances(mesh, instanceVertexBuffer, instanceCount);
+    s_RendererData->RendererAPIInstance->RenderMeshInstances(mesh, instanceVertexBuffer, instanceCount);
   }
 
   void Renderer::RenderLines(const std::vector<Line>& lines, const glm::vec3& color)
   {
-    s_RendererData->RendererAPI->RenderLines(lines, color);
+    s_RendererData->RendererAPIInstance->RenderLines(lines, color);
   }
 
   void Renderer::RenderLines(const std::vector<Line>& lines, const std::vector<glm::vec3>& colors)
   {
-    s_RendererData->RendererAPI->RenderLines(lines, colors);
+    s_RendererData->RendererAPIInstance->RenderLines(lines, colors);
   }
 
 }

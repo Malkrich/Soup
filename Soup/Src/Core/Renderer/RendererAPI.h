@@ -46,7 +46,6 @@ namespace Soup
     virtual ~RendererAPI() = default;
 
     virtual void Init() = 0;
-    virtual void Shutdown() = 0;
 
     virtual API GetAPI() const = 0;
 

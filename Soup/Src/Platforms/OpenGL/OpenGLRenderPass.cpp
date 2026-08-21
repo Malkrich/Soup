@@ -2,6 +2,8 @@
 
 #include "OpenGLFrameBuffer.h"
 #include "OpenGLPipeline.h"
+#include "OpenGLTexture2D.h"
+#include "OpenGLTextureCubemap.h"
 
 #include <glad/glad.h>
 
@@ -15,12 +17,12 @@ namespace Soup
 
   void OpenGLRenderPass::Begin()
   {
-    glViewport(0, 0, m_Specs.FrameBuffer->GetWidth(), m_Specs.FrameBuffer->GetHeight());
+    glViewport(0, 0, m_Specs.FrameBufferObject->GetWidth(), m_Specs.FrameBufferObject->GetHeight());
 
-    SP_ASSERT(std::dynamic_pointer_cast<OpenGLFrameBuffer>(m_Specs.FrameBuffer),
+    SP_ASSERT(std::dynamic_pointer_cast<OpenGLFrameBuffer>(m_Specs.FrameBufferObject),
       "OpenGLRenderPass only supports OpenGLFrameBuffer");
-    std::dynamic_pointer_cast<OpenGLFrameBuffer>(m_Specs.FrameBuffer)->Bind();
-    m_Specs.FrameBuffer->ClearAttachmentsIfNeeded();
+    std::dynamic_pointer_cast<OpenGLFrameBuffer>(m_Specs.FrameBufferObject)->Bind();
+    m_Specs.FrameBufferObject->ClearAttachmentsIfNeeded();
 
     for (auto& [index, texture] : m_TextureInputs)
     {
@@ -44,16 +46,16 @@ namespace Soup
       shaderStorageBuffer->Bind();
     }
 
-    uint32_t width = m_Specs.FrameBuffer->GetWidth();
-    uint32_t height = m_Specs.FrameBuffer->GetHeight();
-    std::dynamic_pointer_cast<OpenGLPipeline>(m_Specs.Pipeline)->Bind(width, height);
+    uint32_t width = m_Specs.FrameBufferObject->GetWidth();
+    uint32_t height = m_Specs.FrameBufferObject->GetHeight();
+    std::dynamic_pointer_cast<OpenGLPipeline>(m_Specs.PipelineObject)->Bind(width, height);
   }
 
   void OpenGLRenderPass::End()
   {
-    SP_ASSERT(std::dynamic_pointer_cast<OpenGLFrameBuffer>(m_Specs.FrameBuffer),
+    SP_ASSERT(std::dynamic_pointer_cast<OpenGLFrameBuffer>(m_Specs.FrameBufferObject),
       "OpenGLRenderPass supports only OpenGLFrameBuffer!");
-    std::dynamic_pointer_cast<OpenGLFrameBuffer>(m_Specs.FrameBuffer)->Unbind();
+    std::dynamic_pointer_cast<OpenGLFrameBuffer>(m_Specs.FrameBufferObject)->Unbind();
   }
 
   void OpenGLRenderPass::RemoveUniformInput(const std::string& name)
@@ -85,8 +87,8 @@ namespace Soup
 
   Ref<Texture2D> OpenGLRenderPass::GetOutput(uint32_t index) const
   {
-    Ref<Texture2D> texture =
-      std::dynamic_pointer_cast<Texture2D>(m_Specs.FrameBuffer->GetColorAttachmentSpecs(index).ExistingAttachment);
+    Ref<Texture2D> texture = std::dynamic_pointer_cast<Texture2D>(
+      m_Specs.FrameBufferObject->GetColorAttachmentSpecs(index).ExistingAttachment);
     SP_ASSERT(texture, "Output has to be texture 2D!");
     return texture;
   }
@@ -94,7 +96,7 @@ namespace Soup
   Ref<Texture2D> OpenGLRenderPass::GetDepthOutput() const
   {
     Ref<Texture2D> texture =
-      std::dynamic_pointer_cast<Texture2D>(m_Specs.FrameBuffer->GetDepthAttachmentSpecs().ExistingAttachment);
+      std::dynamic_pointer_cast<Texture2D>(m_Specs.FrameBufferObject->GetDepthAttachmentSpecs().ExistingAttachment);
     SP_ASSERT(texture, "Output has to be a texture 2D");
     return texture;
   }

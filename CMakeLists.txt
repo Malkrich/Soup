@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.3)
+cmake_minimum_required(VERSION 3.13...4.3)
 
 project(Soup VERSION 1.0)
 

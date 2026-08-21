@@ -66,6 +66,7 @@ list(APPEND headers
     ${core_dir}/Core.h
     ${core_dir}/EntryPoint.h
     ${core_dir}/KeyCodes.h
+    ${core_dir}/MouseButtons.h
     ${core_dir}/Input.h
     ${core_dir}/Time.h
     ${core_dir}/Window.h)
@@ -86,6 +87,17 @@ list(APPEND sources
 list(APPEND headers
     ${gui_dir}/ImGuiLayer.h)
 
+# IO
+set(io_dir ${CMAKE_CURRENT_SOURCE_DIR}/IO)
+list(APPEND headers
+    ${io_dir}/MeshImporter.h
+    ${io_dir}/MeshReader.h
+    ${io_dir}/ObjMeshReader.h)
+
+list(APPEND sources
+    ${io_dir}/MeshImporter.cpp
+    ${io_dir}/ObjMeshReader.cpp)
+
 # Metric
 set(metric_dir ${CMAKE_CURRENT_SOURCE_DIR}/Metric)
 list(APPEND headers
@@ -101,6 +113,7 @@ list(APPEND sources
 
     # Root
     ${renderer_dir}/Camera.cpp
+    ${renderer_dir}/CameraController.cpp
     ${renderer_dir}/FrameBuffer.cpp
     ${renderer_dir}/GpuMesh.cpp
     ${renderer_dir}/GraphicsContext.cpp
@@ -109,6 +122,7 @@ list(APPEND sources
     ${renderer_dir}/Pipeline.cpp
     ${renderer_dir}/Renderer.cpp
     ${renderer_dir}/RenderPass.cpp
+    ${renderer_dir}/SceneRenderer.cpp
     ${renderer_dir}/ShaderStorageBuffer.cpp
     ${renderer_dir}/Texture2D.cpp
     ${renderer_dir}/TextureCubemap.cpp
@@ -124,6 +138,7 @@ list(APPEND headers
 
     # Root
     ${renderer_dir}/Camera.h
+    ${renderer_dir}/CameraController.h
     ${renderer_dir}/FrameBuffer.h
     ${renderer_dir}/GpuMesh.h
     ${renderer_dir}/GraphicsContext.h
@@ -136,6 +151,7 @@ list(APPEND headers
     ${renderer_dir}/RendererAPI.h
     ${renderer_dir}/RendererMaterial.h
     ${renderer_dir}/RenderPass.h
+    ${renderer_dir}/SceneRenderer.h
     ${renderer_dir}/ShaderStorageBuffer.h
     ${renderer_dir}/Texture.h
     ${renderer_dir}/Texture2D.h
@@ -159,10 +175,12 @@ list(APPEND headers
 # Utils
 set(utils_dir ${CMAKE_CURRENT_SOURCE_DIR}/Utils)
 list(APPEND sources
+    ${utils_dir}/FileUtils.cpp
     ${utils_dir}/MathUtils.cpp
     ${utils_dir}/StringUtils.cpp)
 
 list(APPEND headers
+    ${utils_dir}/FileUtils.h
     ${utils_dir}/MathUtils.h
     ${utils_dir}/StringUtils.h)
 

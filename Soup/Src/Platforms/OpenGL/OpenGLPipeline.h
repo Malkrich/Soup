@@ -27,7 +27,7 @@ namespace Soup
   private:
     void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
 
-    void SetPolygonMode(PolygoneMode mode);
+    void SetPolygonMode(PolygonMode mode);
     void EnableFaceCulling(bool enable);
     void SetFaceCullingMode(FaceCullingMode mode);
     void SetFaceWindingMode(FaceWindingMode mode);

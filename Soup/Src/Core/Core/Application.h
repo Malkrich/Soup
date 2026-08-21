@@ -3,7 +3,7 @@
 #include "Core/Event/ApplicationEvent.h"
 #include "Core/Layer/LayerStack.h"
 #include "Core/Window.h"
-#include "Gui/ImGuiLayer.h"
+#include "GUI/ImGuiLayer.h"
 
 namespace Soup
 {
@@ -18,7 +18,7 @@ namespace Soup
   {
   public:
     Application(const ApplicationSpecs& specs);
-    ~Application();
+    virtual ~Application();
 
     static Application& GetInstance() { return *s_Instance; }
     /**

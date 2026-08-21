@@ -7,7 +7,7 @@ namespace Soup::StringUtils
    * Convert a string to the given template type.
    */
   template <typename T>
-  requires(std::is_fundamental<T>::value) T ConvertFromString(const std::string& stringValue)
+  T ConvertFromString(const std::string& stringValue) requires(std::is_fundamental<T>::value)
   {
     T retValue;
     std::from_chars(stringValue.data(), stringValue.data() + stringValue.size(), retValue);

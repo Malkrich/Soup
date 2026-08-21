@@ -17,7 +17,7 @@ namespace Soup
     std::string line;
     LogCore::SetStdCoutForegroundColor(LogColor::Green);
     std::cout << string && std::getline(std::cin, line);
-    LogCore::SetStdCoutForegroundColor(LogColor::White);
+    LogCore::SetStdCoutForegroundColor(LogColor::Default);
     return line;
   }
 

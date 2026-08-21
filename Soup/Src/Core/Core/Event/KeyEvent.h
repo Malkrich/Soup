@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/KeyCodes.h"
 #include "Event.h"
 
 namespace Soup
@@ -8,18 +9,18 @@ namespace Soup
   class KeyEvent : public Event
   {
   public:
-    uint32_t GetKeyCode() const { return m_KeyCode; }
+    KeyCode GetKeyCode() const { return m_KeyCode; }
 
     WRITE_EVENT_CATEGORY(EventCategoryInput | EventCategoryKeyboard)
 
   protected:
     KeyEvent(uint32_t keyCode)
-      : m_KeyCode(keyCode)
+      : m_KeyCode((KeyCode)keyCode)
     {
     }
 
   private:
-    uint32_t m_KeyCode;
+    KeyCode m_KeyCode;
   };
 
   class KeyPressedEvent : public KeyEvent

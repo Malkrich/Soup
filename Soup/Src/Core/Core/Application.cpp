@@ -1,12 +1,8 @@
 #include "Application.h"
 
-#include "Core/Layer/Layer.h"
 #include "Core/Time.h"
+#include "IO/MeshImporter.h"
 #include "Renderer/Renderer.h"
-
-#include <backends/imgui_impl_glfw.h>
-#include <backends/imgui_impl_opengl3.h>
-#include <imgui.h>
 
 namespace Soup
 {
@@ -27,22 +23,26 @@ namespace Soup
     {
       Renderer::Shutdown();
     }
+    Renderer::Shutdown();
+    MeshImporter::Shutdown();
     ApplicationLogger::Shutdown();
   }
 
   void Application::Initialize()
   {
     ApplicationLogger::Init();
+    MeshImporter::Init();
+    Renderer::Init(RendererAPI::API::OpenGL);
 
     if (!m_Specs.Headless)
     {
       // Window
-      Window::WindowSettings windowSettings;
-      windowSettings.Name = "Soup";
-      m_Window = CreateRef<Window>(windowSettings);
+      WindowSpecifications windowSpecs;
+      windowSpecs.Name = m_Specs.Name;
+      m_Window = CreateRef<Window>(windowSpecs);
       m_Window->SetEventCallbackFunction(SP_BIND_EVENT_FUNCTION(Application::OnEvent));
 
-      Renderer::Init();
+      Renderer::InitAPI();
 
       // GUI
       m_ImGuiLayer = CreateRef<ImGuiLayer>();

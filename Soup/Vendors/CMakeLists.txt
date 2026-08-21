@@ -90,5 +90,9 @@ target_include_directories(stb_image PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/stb_image)
 list(APPEND private_targets stb_image)
 
+# tinyobjloader
+add_subdirectory(tinyobjloader)
+list(APPEND private_targets tinyobjloader)
+
 set(SP_VENDORS_PUBLIC_TARGETS ${public_targets} PARENT_SCOPE)
 set(SP_VENDORS_PRIVATE_TARGETS ${private_targets} PARENT_SCOPE)

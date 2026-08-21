@@ -5,7 +5,7 @@
 #if defined(SP_WINDOWS)
 #define SP_DEBUG_BREAK __debugbreak()
 #elif defined(SP_LINUX)
-#include "signal.h"
+#include <signal.h>
 #define SP_DEBUG_BREAK raise(SIGTRAP)
 #else
 #error "SP_DEUG_BREAK not supported on this platform!"

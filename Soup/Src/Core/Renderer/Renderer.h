@@ -18,8 +18,10 @@ namespace Soup
   class Renderer
   {
   public:
-    static void Init();
+    static void Init(RendererAPI::API api);
     static void Shutdown();
+
+    static void InitAPI();
 
     static RendererAPI::API GetCurrentAPI();
 

@@ -4,7 +4,6 @@
 #include "Pipeline.h"
 #include "ShaderStorageBuffer.h"
 #include "Texture2D.h"
-#include "TextureCubemap.h"
 #include "UniformBuffer.h"
 
 #include <glm/glm.hpp>
@@ -14,17 +13,18 @@ namespace Soup
 
   struct RenderPassSpecifications
   {
-    // Pipeline RenderPassPipeline;
     std::string Name;
 
-    Ref<FrameBuffer> FrameBuffer;
-    Ref<Pipeline> Pipeline;
+    Ref<FrameBuffer> FrameBufferObject;
+    Ref<Pipeline> PipelineObject;
   };
 
   class RenderPass
   {
   public:
     static Ref<RenderPass> Create(const RenderPassSpecifications& specs);
+
+    virtual ~RenderPass() = default;
 
     virtual void Begin() = 0;
     virtual void End() = 0;
