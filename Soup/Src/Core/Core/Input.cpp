@@ -8,18 +8,18 @@
 namespace Soup
 {
 
-  bool Input::IsKeyPressed(int32_t keyCode)
+  bool Input::IsKeyPressed(KeyCode keyCode)
   {
     auto libWindow = (GLFWwindow*)Application::GetInstance().GetWindow()->GetWindowHandle();
-    int32_t state = glfwGetKey(libWindow, keyCode);
+    int32_t state = glfwGetKey(libWindow, (uint32_t)keyCode);
 
     return state == GLFW_PRESS;
   }
 
-  bool Input::IsMouseButtonPressed(int32_t button)
+  bool Input::IsMouseButtonPressed(MouseButton button)
   {
     auto libWindow = (GLFWwindow*)Application::GetInstance().GetWindow()->GetWindowHandle();
-    int32_t state = glfwGetMouseButton(libWindow, button);
+    int32_t state = glfwGetMouseButton(libWindow, (uint32_t)button);
 
     return state == GLFW_PRESS;
   }

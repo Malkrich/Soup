@@ -66,6 +66,7 @@ list(APPEND headers
     ${core_dir}/Core.h
     ${core_dir}/EntryPoint.h
     ${core_dir}/KeyCodes.h
+    ${core_dir}/MouseButtons.h
     ${core_dir}/Input.h
     ${core_dir}/Time.h
     ${core_dir}/Window.h)

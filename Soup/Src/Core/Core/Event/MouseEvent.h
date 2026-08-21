@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/MouseButtons.h"
 #include "Event.h"
 
 namespace Soup
@@ -27,18 +28,18 @@ namespace Soup
   class MouseButtonEvent : public Event
   {
   public:
-    inline int32_t GetMouseButton() const { return m_Button; }
+    inline MouseButton GetMouseButton() const { return m_Button; }
 
     WRITE_EVENT_CATEGORY(EventCategoryInput | EventCategoryMouse | EventCategoryMouseButton)
 
   protected:
     MouseButtonEvent(int button)
-      : m_Button(button)
+      : m_Button((MouseButton)button)
     {
     }
 
   private:
-    int32_t m_Button;
+    MouseButton m_Button;
   };
 
   class MousePressedEvent : public MouseButtonEvent

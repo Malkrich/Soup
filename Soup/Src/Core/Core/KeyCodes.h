@@ -25,32 +25,32 @@ namespace Soup
     Number9 = 57,
     Semicolon = 59, /* ; */
     Equal = 61,     /* = */
-    CharA = 65,
-    CharB = 66,
-    CharC = 67,
-    CharD = 68,
-    CharE = 69,
-    CharF = 70,
-    CharG = 71,
-    CharH = 72,
-    CharI = 73,
-    CharJ = 74,
-    CharK = 75,
-    CharL = 76,
-    CharM = 77,
-    CharN = 78,
-    CharO = 79,
-    CharP = 80,
-    CharQ = 81,
-    CharR = 82,
-    CharS = 83,
-    CharT = 84,
-    CharU = 85,
-    CharV = 86,
-    CharW = 87,
-    CharX = 88,
-    CharY = 89,
-    CharZ = 90,
+    A = 65,
+    B = 66,
+    C = 67,
+    D = 68,
+    E = 69,
+    F = 70,
+    G = 71,
+    H = 72,
+    I = 73,
+    J = 74,
+    K = 75,
+    L = 76,
+    M = 77,
+    N = 78,
+    O = 79,
+    P = 80,
+    Q = 81,
+    R = 82,
+    S = 83,
+    T = 84,
+    U = 85,
+    V = 86,
+    W = 87,
+    X = 88,
+    Y = 89,
+    Z = 90,
     LeftBracket = 91,  /* [ */
     BackSlash = 92,    /* \ */
     RightBracket = 93, /* ] */
@@ -134,23 +134,6 @@ namespace Soup
     RightSuper = 347,
     Menu = 348,
     Last = Menu
-  };
-
-  enum class MouseButton
-  {
-    Button1 = 0,
-    Button2 = 1,
-    Button3 = 2,
-    Button4 = 3,
-    Button5 = 4,
-    Button6 = 5,
-    Button7 = 6,
-    Button8 = 7,
-
-    Last = Button8,
-    Left = Button1,
-    Right = Button2,
-    Middle = Button3
   };
 
 } // namespace Soup
