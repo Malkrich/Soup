@@ -168,10 +168,12 @@ list(APPEND headers
 # Scene
 set(scene_dir ${CMAKE_CURRENT_SOURCE_DIR}/Scene)
 list(APPEND sources
+    ${scene_dir}/CameraController.cpp
     ${scene_dir}/Entity.cpp
     ${scene_dir}/Scene.cpp)
 
 list(APPEND headers
+    ${scene_dir}/CameraController.h
     ${scene_dir}/Components.h
     ${scene_dir}/Entity.h
     ${scene_dir}/Scene.h)
