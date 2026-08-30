@@ -77,13 +77,21 @@ list(APPEND sources
 list(APPEND headers
     ${geometry_dir}/Mesh.h)
 
-# Gui
+# GUI
 set(gui_dir ${CMAKE_CURRENT_SOURCE_DIR}/GUI)
 list(APPEND sources
-    ${gui_dir}/ImGuiLayer.cpp)
+    ${gui_dir}/Gizmo.cpp
+    ${gui_dir}/ImGuiLayer.cpp
+    ${gui_dir}/Panel.cpp
+    ${gui_dir}/PanelManager.cpp
+    ${gui_dir}/StyleVariable.cpp)
 
 list(APPEND headers
-    ${gui_dir}/ImGuiLayer.h)
+    ${gui_dir}/Gizmo.h
+    ${gui_dir}/ImGuiLayer.h
+    ${gui_dir}/Panel.h
+    ${gui_dir}/PanelManager.h
+    ${gui_dir}/StyleVariable.h)
 
 # IO
 set(io_dir ${CMAKE_CURRENT_SOURCE_DIR}/IO)
