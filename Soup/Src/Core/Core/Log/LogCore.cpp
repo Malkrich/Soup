@@ -1,15 +1,8 @@
 #include "LogCore.h"
 
-#include "Utils/StringUtils.h"
-
 #if defined(SP_WINDOWS)
 #include <Windows.h>
 #endif
-
-std::ostream& operator<<(std::ostream& os, const std::chrono::year_month_day& date)
-{
-  return os << Soup::StringUtils::DateToString(date);
-}
 
 namespace Soup
 {

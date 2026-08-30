@@ -6,6 +6,7 @@ namespace Soup
   class DeltaTime
   {
   public:
+    DeltaTime() = default;
     DeltaTime(float timeSeconds)
       : m_TimeSeconds(timeSeconds)
     {

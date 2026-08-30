@@ -31,7 +31,6 @@ list(APPEND sources
     # Log
     ${core_dir}/Log/ApplicationLogger.cpp
     ${core_dir}/Log/LogCore.cpp
-    ${core_dir}/Log/Logger.cpp
 
     # Layer
     ${core_dir}/Layer/LayerStack.cpp
@@ -55,7 +54,6 @@ list(APPEND headers
     # Log
     ${core_dir}/Log/ApplicationLogger.h
     ${core_dir}/Log/LogCore.h
-    ${core_dir}/Log/Logger.h
 
     # Memory
     ${core_dir}/Memory/Buffer.h

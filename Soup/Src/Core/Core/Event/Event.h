@@ -56,6 +56,7 @@ namespace Soup
   public:
     virtual EventType GetType() const = 0;
     virtual uint32_t GetCategoryFlags() const = 0;
+    virtual std::string ToString() const = 0;
 
     bool IsInCategory(EventCategory category) { return GetCategoryFlags() & category; }
 

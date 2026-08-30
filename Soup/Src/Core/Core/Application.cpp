@@ -40,7 +40,7 @@ namespace Soup
       WindowSpecifications windowSpecs;
       windowSpecs.Name = m_Specs.Name;
       m_Window = CreateRef<Window>(windowSpecs);
-      m_Window->SetEventCallbackFunction(SP_BIND_EVENT_FUNCTION(Application::OnEvent));
+      m_Window->SetEventCallbackFunction([&](Event& event) { OnEvent(event); });
 
       Renderer::InitAPI();
 
@@ -94,7 +94,7 @@ namespace Soup
       (*(--it))->OnEvent(e);
     }
 
-    dispatcher.Dispatch<WindowCloseEvent>(SP_BIND_EVENT_FUNCTION(Application::OnWindowClose));
+    dispatcher.Dispatch<WindowCloseEvent>([&](const WindowCloseEvent& event) { return OnWindowClose(event); });
   }
 
   bool Application::OnWindowClose(const WindowCloseEvent&)

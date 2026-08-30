@@ -17,7 +17,7 @@ namespace Soup
     /** Return the current window size from GLFW */
     static glm::ivec2 GetWindowSize();
     /** Return the current mouse position from GLFW */
-    static glm::ivec2 GetMousePosition();
+    static glm::ivec2 GetCursorPosition();
   };
 
 }

@@ -18,6 +18,8 @@ namespace Soup
     WRITE_EVENT_TYPE(EventType::CLICommandEnteredEvent);
     WRITE_EVENT_CATEGORY(EventCategory::EventCategoryCLI);
 
+    std::string ToString() const override { return std::format("Command entered: {}", m_Line); }
+
   public:
     std::string m_Line;
   };

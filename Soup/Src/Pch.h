@@ -23,3 +23,4 @@
 
 #include "Core/Core.h"
 #include "Core/Log/ApplicationLogger.h"
+#include "Core/Log/LogCore.h"

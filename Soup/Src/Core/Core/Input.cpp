@@ -34,14 +34,14 @@ namespace Soup
     return dimension;
   }
 
-  glm::ivec2 Input::GetMousePosition()
+  glm::ivec2 Input::GetCursorPosition()
   {
     auto libWindow = (GLFWwindow*)Application::GetInstance().GetWindow()->GetWindowHandle();
     glm::dvec2 position;
     glfwGetCursorPos(libWindow, &position.x, &position.y);
 
-    glm::ivec2 mousePosition = { (int32_t)position.x, (int32_t)position.y };
-    return mousePosition;
+    glm::ivec2 cursorPosition = { (int32_t)position.x, (int32_t)position.y };
+    return cursorPosition;
   }
 
 }

@@ -32,6 +32,8 @@ namespace Soup
     }
 
     WRITE_EVENT_TYPE(EventType::KeyPressed)
+
+    std::string ToString() const override { return std::format("Key pressed: {}", (uint32_t)GetKeyCode()); }
   };
 
   class KeyReleasedEvent : public KeyEvent
@@ -43,6 +45,8 @@ namespace Soup
     }
 
     WRITE_EVENT_TYPE(EventType::KeyReleased)
+
+    std::string ToString() const override { return std::format("Key released: {}", (uint32_t)GetKeyCode()); }
   };
 
 }
