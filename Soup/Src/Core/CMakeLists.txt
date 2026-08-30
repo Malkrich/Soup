@@ -119,7 +119,6 @@ list(APPEND sources
 
     # Root
     ${renderer_dir}/Camera.cpp
-    ${renderer_dir}/CameraController.cpp
     ${renderer_dir}/FrameBuffer.cpp
     ${renderer_dir}/GpuMesh.cpp
     ${renderer_dir}/GraphicsContext.cpp
@@ -144,7 +143,6 @@ list(APPEND headers
 
     # Root
     ${renderer_dir}/Camera.h
-    ${renderer_dir}/CameraController.h
     ${renderer_dir}/FrameBuffer.h
     ${renderer_dir}/GpuMesh.h
     ${renderer_dir}/GraphicsContext.h

@@ -7,6 +7,11 @@
 namespace Soup
 {
 
+  Camera::Camera()
+  {
+    UpdateViewMatrix();
+  }
+
   Camera::Camera(const glm::vec3& position, float pitch, float yaw)
     : m_Position(position)
     , m_Pitch(pitch)

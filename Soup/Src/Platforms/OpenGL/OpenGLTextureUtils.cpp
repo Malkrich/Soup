@@ -73,6 +73,8 @@ namespace Soup::OpenGLTextureUtils
         return GL_FLOAT;
 
       case TextureFormat::R8:
+        return GL_INT;
+
       case TextureFormat::RGB8:
       case TextureFormat::RGBA8:
         return GL_UNSIGNED_BYTE;

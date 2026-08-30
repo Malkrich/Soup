@@ -50,7 +50,7 @@ namespace Soup
     Invalidate(data);
   }
 
-  Ref<OpenGLTexture2D> OpenGLTexture2D::copy(
+  Ref<OpenGLTexture2D> OpenGLTexture2D::Copy(
     const Texture2DSpecifications& specs, uint32_t textureSource, uint32_t width, uint32_t height)
   {
     Ref<OpenGLTexture2D> texture = CreateRef<OpenGLTexture2D>(specs, width, height);
@@ -86,6 +86,12 @@ namespace Soup
 
   void OpenGLTexture2D::Invalidate(const void* data)
   {
+    if (m_TextureID != 0)
+    {
+      glDeleteTextures(1, &m_TextureID);
+      m_TextureID = 0;
+    }
+
     glGenTextures(1, &m_TextureID);
     glBindTexture(GL_TEXTURE_2D, m_TextureID);
 
@@ -104,6 +110,29 @@ namespace Soup
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterMagParam);
 
     CHECK_GL_ERROR();
+  }
+
+  int32_t OpenGLTexture2D::GetPixelInteger(uint32_t x, uint32_t y) const
+  {
+    if (m_Specs.Format != TextureFormat::R8)
+    {
+      SP_LOG_ERROR("Could read pixel integer because texture format is not compatible. Returning 0.");
+      return 0;
+    }
+
+    if (x < 0 || x >= m_Width || y < 0 || y >= m_Height)
+    {
+      SP_LOG_ERROR("Pixel coordinates are out of bonds. Returning 0.");
+      return 0;
+    }
+
+    int32_t* pixelData = new int32_t[m_Width * m_Height];
+    glBindTexture(GL_TEXTURE_2D, m_TextureID);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_INT, pixelData);
+
+    int32_t pixelValue = pixelData[y * m_Width + x];
+    delete[] pixelData;
+    return pixelValue;
   }
 
 }

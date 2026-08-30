@@ -5,6 +5,11 @@
 namespace Soup
 {
 
+  PerspectiveCamera::PerspectiveCamera()
+  {
+    UpdateProjectionMatrix();
+  }
+  
   PerspectiveCamera::PerspectiveCamera(float width, float height, const glm::vec3& position, float pitch, float yaw,
     float fov, float nearClip, float farClip)
     : Camera(position, pitch, yaw)

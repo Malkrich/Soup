@@ -18,7 +18,7 @@ namespace Soup
     Ref<Texture> ExistingAttachment = nullptr;
 
     // Clear
-    bool ClearAttachemnt = false;
+    bool ClearAttachment = false;
     glm::vec4 ClearColor = { 1.0f, 1.0f, 0.0f, 1.0f };
 
     // Misc
@@ -56,8 +56,11 @@ namespace Soup
     virtual const FrameBufferAttachmentSpecs& GetColorAttachmentSpecs(uint32_t attachmentIndex) const = 0;
     virtual const FrameBufferAttachmentSpecs& GetDepthAttachmentSpecs() const = 0;
 
+    /**
+     * Set wether or not to clear the color attachment at the given index when ClearAttachmentsIfNeeded is called.
+     */
+    virtual void SetClearColorAttachment(uint32_t index, bool clear) = 0;
     virtual void ClearAttachmentsIfNeeded() = 0;
-    virtual int32_t ReadPixel(uint32_t attachmentIndex, uint32_t mouseX, uint32_t mouseY) const = 0;
 
     virtual uint32_t GetColorAttachment(uint32_t index) const = 0;
     virtual void SetColorAttachment(uint32_t index, Ref<Texture> texture) = 0;

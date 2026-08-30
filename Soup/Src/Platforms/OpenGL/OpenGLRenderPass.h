@@ -13,20 +13,21 @@ namespace Soup
   public:
     OpenGLRenderPass(const RenderPassSpecifications& specs);
 
-    virtual void Begin() override;
-    virtual void End() override;
+    void Begin() override;
+    void End() override;
 
-    virtual Ref<FrameBuffer> GetFrameBuffer() override { return m_Specs.FrameBufferObject; }
-    virtual Ref<Pipeline> GetPipeline() override { return m_Specs.PipelineObject; }
+    const RenderPassSpecifications& GetSpecifications() const override { return m_Specs; }
+    Ref<FrameBuffer> GetFrameBuffer() override { return m_Specs.FrameBufferObject; }
+    Ref<Pipeline> GetPipeline() override { return m_Specs.PipelineObject; }
 
-    virtual void RemoveUniformInput(const std::string& name) override;
+    void RemoveUniformInput(const std::string& name) override;
 
-    virtual void SetInput(uint32_t index, Ref<Texture> texture) override;
-    virtual void SetInput(const std::string& name, Ref<UniformBuffer> texture) override;
-    virtual void SetInput(const std::string& name, Ref<ShaderStorageBuffer> texture) override;
+    void SetInput(uint32_t index, Ref<Texture> texture) override;
+    void SetInput(const std::string& name, Ref<UniformBuffer> texture) override;
+    void SetInput(const std::string& name, Ref<ShaderStorageBuffer> texture) override;
 
-    virtual Ref<Texture2D> GetOutput(uint32_t index) const override;
-    virtual Ref<Texture2D> GetDepthOutput() const override;
+    Ref<Texture2D> GetOutput(uint32_t index) const override;
+    Ref<Texture2D> GetDepthOutput() const override;
 
   private:
     RenderPassSpecifications m_Specs;

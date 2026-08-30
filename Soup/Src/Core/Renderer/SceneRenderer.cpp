@@ -18,10 +18,11 @@ namespace Soup
     {
       std::filesystem::path shaderBaseDir = "./data/Shaders/";
 
-      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "PBRMesh.glsl");
       Renderer::GetShaderLibrary()->Load(shaderBaseDir / "WireframeMesh.glsl");
-      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "PBRLegoMesh.glsl");
-      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "SolidLegoMesh.glsl");
+      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "PBRMesh.glsl");
+      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "SolidMesh.glsl");
+      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "PBRInstanceMesh.glsl");
+      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "SolidInstanceMesh.glsl");
 
       Renderer::GetShaderLibrary()->Load(shaderBaseDir / "EquirectangularToCubemap.glsl");
       Renderer::GetShaderLibrary()->Load(shaderBaseDir / "IrradianceMap.glsl");
@@ -50,11 +51,10 @@ namespace Soup
     }
 
     // Entity id attachment
-    Ref<Texture2D> entityIdAttachment = nullptr;
     {
-      Texture2DSpecifications entityIdAttachmentSpecs;
-      entityIdAttachmentSpecs.Format = TextureFormat::R8;
-      entityIdAttachment = Texture2D::Create(entityIdAttachmentSpecs, viewportWidth, viewportHeight);
+      Texture2DSpecifications entityIdImageSpecs;
+      entityIdImageSpecs.Format = TextureFormat::R8;
+      m_EntityIdImage = Texture2D::Create(entityIdImageSpecs, viewportWidth, viewportHeight);
     }
 
     // Camera
@@ -73,19 +73,28 @@ namespace Soup
       m_MeshDataUbo = UniformBuffer::Create(uboSpecs, sizeof(MeshDataUbo));
     }
 
-    // Materials
-    {
-      UniformBufferSpecifications uboSpecs;
-      uboSpecs.BlockName = "u_PBRMaterialData";
-      uboSpecs.BindingPoint = 3;
-      m_PBRMaterialUbo = UniformBuffer::Create(uboSpecs, sizeof(PBRMaterialUbo));
-    }
-
+    // Wireframe Material
     {
       UniformBufferSpecifications uboSpecs;
       uboSpecs.BlockName = "u_WireframeMaterialData";
       uboSpecs.BindingPoint = 3;
       m_WireframeMaterialUbo = UniformBuffer::Create(uboSpecs, sizeof(WireframeMaterialUbo));
+    }
+
+    // Solid Material
+    {
+      UniformBufferSpecifications uboSpecs;
+      uboSpecs.BlockName = "u_SolidMaterialData";
+      uboSpecs.BindingPoint = 3;
+      m_SolidMaterialUbo = UniformBuffer::Create(uboSpecs, sizeof(SolidMaterialUbo));
+    }
+
+    // PBR Material
+    {
+      UniformBufferSpecifications uboSpecs;
+      uboSpecs.BlockName = "u_PBRMaterialData";
+      uboSpecs.BindingPoint = 3;
+      m_PBRMaterialUbo = UniformBuffer::Create(uboSpecs, sizeof(PBRMaterialUbo));
     }
 
     // Skybox
@@ -124,11 +133,41 @@ namespace Soup
       m_LightMesh = GpuMesh::Create(lightMeshVertices, lightMeshIndices);
     }
 
-    // Light instances vertex buffer
     m_LightInstanceVbo = VertexBuffer::Create();
-
-    // Lego part instances
     m_InstanceVbo = VertexBuffer::Create();
+
+    const glm::vec4 backgroundClearColor = { 0.2f, 0.2f, 0.2f, 1.0f };
+
+    // Skybox render pass
+    {
+      FrameBufferSpecifications frameBufferSpecs;
+      frameBufferSpecs.Width = viewportWidth;
+      frameBufferSpecs.Height = viewportHeight;
+      frameBufferSpecs.Attachments = { TextureFormat::RGBA8, TextureFormat::Depth };
+      frameBufferSpecs.Attachments[0].ExistingAttachment = m_RenderedImage;
+      frameBufferSpecs.Attachments[0].ClearAttachment = true;
+      frameBufferSpecs.Attachments[0].ClearColor = backgroundClearColor;
+      frameBufferSpecs.Attachments[1].ExistingAttachment = depthAttachment;
+      frameBufferSpecs.Attachments[1].ClearAttachment = true;
+      Ref<FrameBuffer> frameBuffer = FrameBuffer::Create(frameBufferSpecs);
+
+      PipelineSpecifications pipelineSpecs;
+      pipelineSpecs.GeometryLayout = {
+        { "a_Position", BufferElementType::Float3 },
+      };
+      pipelineSpecs.CubemapSeamless = true;
+      pipelineSpecs.ShaderProgram = Renderer::GetShaderLibrary()->Get("Skybox");
+      Ref<Pipeline> pipeline = Pipeline::Create(pipelineSpecs);
+
+      RenderPassSpecifications renderPassSpecs;
+      renderPassSpecs.Name = "SkyboxRenderPass";
+      renderPassSpecs.FrameBufferObject = frameBuffer;
+      renderPassSpecs.PipelineObject = pipeline;
+      m_SkyboxRenderPass = RenderPass::Create(renderPassSpecs);
+
+      m_SkyboxRenderPass->SetInput("u_CameraData", m_CameraDataUbo);
+      m_SkyboxRenderPass->SetInput("u_SkyboxData", m_SkyboxDataUbo);
+    }
 
     // Entity outline render pass
     {
@@ -136,11 +175,10 @@ namespace Soup
       frameBufferSpecs.Width = viewportWidth;
       frameBufferSpecs.Height = viewportHeight;
       frameBufferSpecs.Attachments = { TextureFormat::RGBA8, TextureFormat::Depth };
-      frameBufferSpecs.Attachments[0].ClearAttachemnt = true;
-      frameBufferSpecs.Attachments[0].ClearColor = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
       frameBufferSpecs.Attachments[0].ExistingAttachment = m_RenderedImage;
-      frameBufferSpecs.Attachments[1].ExistingAttachment = depthAttachment;
-      frameBufferSpecs.Attachments[1].ClearAttachemnt = true;
+      frameBufferSpecs.Attachments[0].ClearAttachment = true;
+      frameBufferSpecs.Attachments[0].ClearColor = backgroundClearColor;
+      frameBufferSpecs.Attachments[1].ClearAttachment = true;
       Ref<FrameBuffer> frameBuffer = FrameBuffer::Create(frameBufferSpecs);
 
       PipelineSpecifications pipelineSpecs;
@@ -169,10 +207,11 @@ namespace Soup
       frameBufferSpecs.Height = viewportHeight;
       frameBufferSpecs.Attachments = { TextureFormat::RGBA8, TextureFormat::R8, TextureFormat::Depth };
       frameBufferSpecs.Attachments[0].ExistingAttachment = m_EntityOutlineRenderPass->GetOutput(0);
-      frameBufferSpecs.Attachments[1].ExistingAttachment = entityIdAttachment;
-      frameBufferSpecs.Attachments[1].ClearColor = glm::vec4(-1.0f, 0.0f, 0.0f, 0.0f);
-      frameBufferSpecs.Attachments[1].ClearAttachemnt = true;
-      frameBufferSpecs.Attachments[2].ExistingAttachment = m_EntityOutlineRenderPass->GetDepthOutput();
+      frameBufferSpecs.Attachments[1].ExistingAttachment = m_EntityIdImage;
+      frameBufferSpecs.Attachments[1].ClearColor = glm::vec4(-1.0f);
+      frameBufferSpecs.Attachments[1].ClearAttachment = true;
+      frameBufferSpecs.Attachments[2].ExistingAttachment = depthAttachment;
+      frameBufferSpecs.Attachments[2].ClearAttachment = true;
       Ref<FrameBuffer> frameBuffer = FrameBuffer::Create(frameBufferSpecs);
 
       PipelineSpecifications pipelineSpecs;
@@ -180,28 +219,29 @@ namespace Soup
         { "a_Normal", BufferElementType::Float3 } };
       pipelineSpecs.ShaderProgram = Renderer::GetShaderLibrary()->Get("PBRMesh");
       pipelineSpecs.CubemapSeamless = true;
+      pipelineSpecs.EnableFaceCulling = false;
       Ref<Pipeline> pipeline = Pipeline::Create(pipelineSpecs);
 
       RenderPassSpecifications renderPassSpecs;
-      renderPassSpecs.Name = "PBRRenderPass";
+      renderPassSpecs.Name = "MeshRenderPass";
       renderPassSpecs.FrameBufferObject = frameBuffer;
       renderPassSpecs.PipelineObject = pipeline;
-      m_PbrRenderPass = RenderPass::Create(renderPassSpecs);
+      m_MeshRenderPass = RenderPass::Create(renderPassSpecs);
 
       // Camera
-      m_PbrRenderPass->SetInput("u_CameraData", m_CameraDataUbo);
-      m_PbrRenderPass->SetInput("s_LightsData", m_LightsDataSsbo);
+      m_MeshRenderPass->SetInput("u_CameraData", m_CameraDataUbo);
+      m_MeshRenderPass->SetInput("s_LightsData", m_LightsDataSsbo);
     }
 
-    // Lego part render pass
+    // Instance render pass
     {
       FrameBufferSpecifications frameBufferSpecs;
       frameBufferSpecs.Width = viewportWidth;
       frameBufferSpecs.Height = viewportHeight;
       frameBufferSpecs.Attachments = { TextureFormat::RGBA8, TextureFormat::R8, TextureFormat::Depth };
-      frameBufferSpecs.Attachments[0].ExistingAttachment = m_PbrRenderPass->GetOutput(0);
-      frameBufferSpecs.Attachments[1].ExistingAttachment = m_PbrRenderPass->GetOutput(1);
-      frameBufferSpecs.Attachments[2].ExistingAttachment = m_PbrRenderPass->GetDepthOutput();
+      frameBufferSpecs.Attachments[0].ExistingAttachment = m_MeshRenderPass->GetOutput(0);
+      frameBufferSpecs.Attachments[1].ExistingAttachment = m_MeshRenderPass->GetOutput(1);
+      frameBufferSpecs.Attachments[2].ExistingAttachment = m_MeshRenderPass->GetDepthOutput();
       Ref<FrameBuffer> frameBuffer = FrameBuffer::Create(frameBufferSpecs);
 
       PipelineSpecifications pipelineSpecs;
@@ -210,14 +250,13 @@ namespace Soup
       pipelineSpecs.InstanceLayout = { { "a_EntityID", BufferElementType::Int },
         { "a_Albedo", BufferElementType::Float4 }, { "a_Roughness", BufferElementType::Float },
         { "a_Metalness", BufferElementType::Float }, { "a_Transform", BufferElementType::Mat4 } };
-      pipelineSpecs.FaceWinding = FaceWindingMode::Clockwise;
-      pipelineSpecs.ShaderProgram = Renderer::GetShaderLibrary()->Get("SolidLegoMesh");
+      pipelineSpecs.ShaderProgram = Renderer::GetShaderLibrary()->Get("SolidInstanceMesh");
       pipelineSpecs.CubemapSeamless = true;
       pipelineSpecs.EnableFaceCulling = false;
       Ref<Pipeline> pipeline = Pipeline::Create(pipelineSpecs);
 
       RenderPassSpecifications renderPassSpecs;
-      renderPassSpecs.Name = "PBRRenderPass";
+      renderPassSpecs.Name = "InstanceRenderPass";
       renderPassSpecs.FrameBufferObject = frameBuffer;
       renderPassSpecs.PipelineObject = pipeline;
       m_InstanceRenderPass = RenderPass::Create(renderPassSpecs);
@@ -277,34 +316,6 @@ namespace Soup
       m_LinesRenderPass->SetInput("u_CameraData", m_CameraDataUbo);
     }
 
-    // Skybox render pass
-    {
-      FrameBufferSpecifications frameBufferSpecs;
-      frameBufferSpecs.Width = viewportWidth;
-      frameBufferSpecs.Height = viewportHeight;
-      frameBufferSpecs.Attachments = { TextureFormat::RGBA8, TextureFormat::Depth };
-      frameBufferSpecs.Attachments[0].ExistingAttachment = m_LinesRenderPass->GetOutput(0);
-      frameBufferSpecs.Attachments[1].ExistingAttachment = m_LinesRenderPass->GetDepthOutput();
-      Ref<FrameBuffer> frameBuffer = FrameBuffer::Create(frameBufferSpecs);
-
-      PipelineSpecifications pipelineSpecs;
-      pipelineSpecs.GeometryLayout = {
-        { "a_Position", BufferElementType::Float3 },
-      };
-      pipelineSpecs.CubemapSeamless = true;
-      pipelineSpecs.ShaderProgram = Renderer::GetShaderLibrary()->Get("Skybox");
-      Ref<Pipeline> pipeline = Pipeline::Create(pipelineSpecs);
-
-      RenderPassSpecifications renderPassSpecs;
-      renderPassSpecs.Name = "SkyboxRenderPass";
-      renderPassSpecs.FrameBufferObject = frameBuffer;
-      renderPassSpecs.PipelineObject = pipeline;
-      m_SkyboxRenderPass = RenderPass::Create(renderPassSpecs);
-
-      m_SkyboxRenderPass->SetInput("u_CameraData", m_CameraDataUbo);
-      m_SkyboxRenderPass->SetInput("u_SkyboxData", m_SkyboxDataUbo);
-    }
-
     // Lines
     m_OriginLines = { Line({ 0.0f, 0.0f, 0.0f }, { 0.1f, 0.0f, 0.0f }),
       Line({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.1f, 0.0f }), Line({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.1f }) };
@@ -318,24 +329,17 @@ namespace Soup
     m_GridLines = GenerateGrid(m_RendererSettings.GridBound, m_RendererSettings.GridStep);
   }
 
-  int32_t SceneRenderer::GetEntityIDAt(uint32_t mouseX, uint32_t mouseY) const
-  {
-    // TODO: move to OpenGL renderer API
-    int32_t data = m_PbrRenderPass->GetFrameBuffer()->ReadPixel(1, mouseX, mouseY);
-    return data;
-  }
-
   void SceneRenderer::ResizeViewport(uint32_t width, uint32_t height)
   {
     m_EntityOutlineRenderPass->GetFrameBuffer()->Resize(width, height);
-    m_PbrRenderPass->GetFrameBuffer()->Resize(width, height);
+    m_MeshRenderPass->GetFrameBuffer()->Resize(width, height);
     m_InstanceRenderPass->GetFrameBuffer()->Resize(width, height);
     m_LightsRenderPass->GetFrameBuffer()->Resize(width, height);
     m_LinesRenderPass->GetFrameBuffer()->Resize(width, height);
     m_SkyboxRenderPass->GetFrameBuffer()->Resize(width, height);
   }
 
-  void SceneRenderer::Render(const PerspectiveCamera& camera, Ref<Scene> scene)
+  void SceneRenderer::Render(Ref<Scene> scene)
   {
     size_t lightCount = scene->GetEntityCount<TransformComponent, LightComponent>();
     SceneLightsData lightsData;
@@ -352,7 +356,12 @@ namespace Soup
         lightsData.PointLightIDs.emplace_back(entityId);
       });
 
-    SetSceneEnvironment(camera, lightsData);
+    Ref<Camera> camera = scene->GetActiveCamera();
+    if (camera->GetType() == CameraType::Perspective)
+    {
+      const PerspectiveCamera& perspectiveCamera = *std::dynamic_pointer_cast<PerspectiveCamera>(camera);
+      SetSceneEnvironment(perspectiveCamera, lightsData);
+    }
 
     scene->EntityView<TransformComponent, MeshComponent, MaterialComponent>(
       [&](Entity entity)
@@ -401,13 +410,13 @@ namespace Soup
     m_EntityOutlineRenderPass->GetPipeline()->GetSpecifications().LineWidth = m_RendererSettings.OutlineWidth;
   }
 
-  void SceneRenderer::SetEnvironment(Ref<Texture2D> hdriTexture, const EnvironmentCreateInfo& environmentCreateInfo)
+  void SceneRenderer::CreateEnvironment(Ref<Texture2D> hdriTexture, const EnvironmentCreateInfo& environmentCreateInfo)
   {
     m_Environment = Renderer::CreateEnvironment(hdriTexture, environmentCreateInfo);
 
-    m_PbrRenderPass->SetInput(0, m_Environment.IrradianceMap);
-    m_PbrRenderPass->SetInput(1, m_Environment.PreFilteredEnvMap);
-    m_PbrRenderPass->SetInput(2, m_Environment.BrdfLUTTexture);
+    m_MeshRenderPass->SetInput(0, m_Environment.IrradianceMap);
+    m_MeshRenderPass->SetInput(1, m_Environment.PreFilteredEnvMap);
+    m_MeshRenderPass->SetInput(2, m_Environment.BrdfLUTTexture);
 
     m_InstanceRenderPass->SetInput(0, m_Environment.IrradianceMap);
     m_InstanceRenderPass->SetInput(1, m_Environment.PreFilteredEnvMap);
@@ -420,7 +429,9 @@ namespace Soup
     std::vector<InstanceVertex>& instances = m_InstanceSubmissions[mesh];
     InstanceVertex instanceVertex;
     instanceVertex.EntityID = entityID;
-    instanceVertex.Material = material.Material;
+    instanceVertex.Albedo = material.Material.Albedo;
+    instanceVertex.Metalness = material.Material.Metalness;
+    instanceVertex.Roughness = material.Material.Roughness;
     instanceVertex.Transform = transform.GetTransform();
     instances.push_back(instanceVertex);
   }
@@ -434,86 +445,6 @@ namespace Soup
 
   void SceneRenderer::Render()
   {
-    // Outline pass
-    {
-      Renderer::BeginRenderPass(m_EntityOutlineRenderPass);
-      if (m_SelectedEntity && m_SelectedEntity.HasComponent<TransformComponent>() &&
-        m_SelectedEntity.HasComponent<MeshComponent>())
-      {
-        Ref<GpuMesh> mesh = m_SelectedEntity.GetComponent<MeshComponent>().MeshData;
-        m_MeshDataUboStructs.Transform = m_SelectedEntity.GetComponent<TransformComponent>().GetTransform();
-        m_MeshDataUboStructs.EntityID = 0;
-        m_MeshDataUbo->SetData(&m_MeshDataUboStructs);
-
-        m_WireframeMaterialUboStruct.Color = m_RendererSettings.OutlineColor;
-        m_WireframeMaterialUbo->SetData(&m_WireframeMaterialUboStruct);
-
-        Renderer::RenderMesh(mesh, m_MeshDataUbo, m_WireframeMaterialUbo);
-      }
-      Renderer::EndRenderPass();
-    }
-
-    // PBR Pass
-    {
-      Renderer::BeginRenderPass(m_PbrRenderPass);
-      for (const MeshSubmissionData& meshSub : m_MeshSubmissions)
-      {
-        m_MeshDataUboStructs.Transform = meshSub.Transform;
-        m_MeshDataUboStructs.EntityID = meshSub.EntityID;
-        m_MeshDataUbo->SetData(&m_MeshDataUboStructs);
-
-        m_PBRMaterialUboStruct.Material = meshSub.Material;
-        m_PBRMaterialUbo->SetData(&m_PBRMaterialUboStruct);
-
-        Renderer::RenderMesh(meshSub.Mesh, m_MeshDataUbo, m_PBRMaterialUbo);
-      }
-      Renderer::EndRenderPass();
-    }
-
-    // Instance rendering
-    {
-      Renderer::BeginRenderPass(m_InstanceRenderPass);
-      switch (m_RendererSettings.RenderingPreset)
-      {
-        case RendererPreset::Solid:
-          m_InstanceRenderPass->GetPipeline()->GetSpecifications().ShaderProgram =
-            Renderer::GetShaderLibrary()->Get("SolidLegoMesh");
-          break;
-        case RendererPreset::Lighted:
-          m_InstanceRenderPass->GetPipeline()->GetSpecifications().ShaderProgram =
-            Renderer::GetShaderLibrary()->Get("PBRLegoMesh");
-          break;
-      }
-
-      for (const auto& [mesh, instanceVertices] : m_InstanceSubmissions)
-      {
-        m_InstanceVbo->SetData(instanceVertices.size() * sizeof(InstanceVertex), instanceVertices.data());
-        Renderer::RenderMeshInstances(mesh, m_InstanceVbo, instanceVertices.size());
-      }
-      Renderer::EndRenderPass();
-    }
-
-    // Lights render pass
-    if (!m_LightInstancesStruct.empty())
-    {
-      Renderer::BeginRenderPass(m_LightsRenderPass);
-
-      m_LightInstanceVbo->SetData(m_LightInstancesStruct.size() * sizeof(uint32_t), m_LightInstancesStruct.data());
-      Renderer::RenderMeshInstances(m_LightMesh, m_LightInstanceVbo, m_LightInstancesStruct.size());
-
-      Renderer::EndRenderPass();
-    }
-
-    // Grid and origin pass
-    {
-      Renderer::BeginRenderPass(m_LinesRenderPass);
-      // Origin
-      Renderer::RenderLines(m_OriginLines, m_OriginLineColors);
-      // Grid
-      Renderer::RenderLines(m_GridLines, m_RendererSettings.GridColor);
-      Renderer::EndRenderPass();
-    }
-
     // Skybox pass
     {
       if (m_RendererSettings.RenderingPreset == RendererPreset::Lighted)
@@ -540,6 +471,109 @@ namespace Soup
           Renderer::EndRenderPass();
         }
       }
+    }
+
+    // Outline pass
+    {
+      m_EntityOutlineRenderPass->GetFrameBuffer()->SetClearColorAttachment(
+        0, m_RendererSettings.RenderingPreset != RendererPreset::Lighted);
+
+      Renderer::BeginRenderPass(m_EntityOutlineRenderPass);
+      if (m_SelectedEntity && m_SelectedEntity.HasComponent<TransformComponent>() &&
+        m_SelectedEntity.HasComponent<MeshComponent>())
+      {
+        Ref<GpuMesh> mesh = m_SelectedEntity.GetComponent<MeshComponent>().MeshData;
+        m_MeshDataUboStructs.Transform = m_SelectedEntity.GetComponent<TransformComponent>().GetTransform();
+        m_MeshDataUboStructs.EntityID = 0;
+        m_MeshDataUbo->SetData(&m_MeshDataUboStructs);
+
+        m_WireframeMaterialUboStruct.Color = m_RendererSettings.OutlineColor;
+        m_WireframeMaterialUbo->SetData(&m_WireframeMaterialUboStruct);
+
+        Renderer::RenderMesh(mesh, m_MeshDataUbo, m_WireframeMaterialUbo);
+      }
+      Renderer::EndRenderPass();
+    }
+
+    switch (m_RendererSettings.RenderingPreset)
+    {
+      case RendererPreset::Solid:
+        m_MeshRenderPass->GetPipeline()->GetSpecifications().ShaderProgram =
+          Renderer::GetShaderLibrary()->Get("SolidMesh");
+        m_InstanceRenderPass->GetPipeline()->GetSpecifications().ShaderProgram =
+          Renderer::GetShaderLibrary()->Get("SolidInstanceMesh");
+        break;
+      case RendererPreset::Lighted:
+        m_MeshRenderPass->GetPipeline()->GetSpecifications().ShaderProgram =
+          Renderer::GetShaderLibrary()->Get("PBRMesh");
+        m_InstanceRenderPass->GetPipeline()->GetSpecifications().ShaderProgram =
+          Renderer::GetShaderLibrary()->Get("PBRInstanceMesh");
+        break;
+    }
+
+    // Mesh pass
+    {
+      Renderer::BeginRenderPass(m_MeshRenderPass);
+      for (const MeshSubmissionData& meshSub : m_MeshSubmissions)
+      {
+        m_MeshDataUboStructs.Transform = meshSub.Transform;
+        m_MeshDataUboStructs.EntityID = meshSub.EntityID;
+        m_MeshDataUbo->SetData(&m_MeshDataUboStructs);
+
+        Ref<UniformBuffer> materialUbo = nullptr;
+        switch (m_RendererSettings.RenderingPreset)
+        {
+          case RendererPreset::Solid:
+            m_SolidMaterialUboStruct.Color = meshSub.Material.Albedo;
+            m_SolidMaterialUbo->SetData(&m_SolidMaterialUboStruct);
+            materialUbo = m_SolidMaterialUbo;
+            break;
+          case RendererPreset::Lighted:
+            m_PBRMaterialUboStruct.Albedo = meshSub.Material.Albedo;
+            m_PBRMaterialUboStruct.Metalness = meshSub.Material.Metalness;
+            m_PBRMaterialUboStruct.Roughness = meshSub.Material.Roughness;
+            m_PBRMaterialUbo->SetData(&m_PBRMaterialUboStruct);
+            materialUbo = m_PBRMaterialUbo;
+            break;
+        }
+        SP_ASSERT(materialUbo, "Material UBO not found for mesh rendering");
+
+        Renderer::RenderMesh(meshSub.Mesh, m_MeshDataUbo, materialUbo);
+      }
+      Renderer::EndRenderPass();
+    }
+
+    // Instance pass
+    {
+      Renderer::BeginRenderPass(m_InstanceRenderPass);
+
+      for (const auto& [mesh, instanceVertices] : m_InstanceSubmissions)
+      {
+        m_InstanceVbo->SetData(instanceVertices.size() * sizeof(InstanceVertex), instanceVertices.data());
+        Renderer::RenderMeshInstances(mesh, m_InstanceVbo, instanceVertices.size());
+      }
+      Renderer::EndRenderPass();
+    }
+
+    // Lights pass
+    if (!m_LightInstancesStruct.empty())
+    {
+      Renderer::BeginRenderPass(m_LightsRenderPass);
+
+      m_LightInstanceVbo->SetData(m_LightInstancesStruct.size() * sizeof(uint32_t), m_LightInstancesStruct.data());
+      Renderer::RenderMeshInstances(m_LightMesh, m_LightInstanceVbo, m_LightInstancesStruct.size());
+
+      Renderer::EndRenderPass();
+    }
+
+    // Grid and origin pass
+    {
+      Renderer::BeginRenderPass(m_LinesRenderPass);
+      // Origin
+      Renderer::RenderLines(m_OriginLines, m_OriginLineColors);
+      // Grid
+      Renderer::RenderLines(m_GridLines, m_RendererSettings.GridColor);
+      Renderer::EndRenderPass();
     }
 
     // TODO: optimize memory management across frames

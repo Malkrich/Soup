@@ -164,7 +164,7 @@ namespace Soup
     return "";
   }
 
-#define BV_OPENGL_MESSAGE_CALLBACK_LOG                                                                                 \
+#define SP_OPENGL_MESSAGE_CALLBACK_LOG                                                                                 \
   "[OpenGL Error Message]:\n"                                                                                          \
   "    - Source: {}\n"                                                                                                 \
   "    - Type: {}\n"                                                                                                   \
@@ -179,16 +179,16 @@ namespace Soup
     switch (severity)
     {
       case GL_DEBUG_SEVERITY_HIGH:
-        SP_LOG_ERROR(BV_OPENGL_MESSAGE_CALLBACK_LOG, sourceStr, typeStr, message);
+        SP_LOG_ERROR(SP_OPENGL_MESSAGE_CALLBACK_LOG, sourceStr, typeStr, message);
         break;
       case GL_DEBUG_SEVERITY_MEDIUM:
-        SP_LOG_WARN(BV_OPENGL_MESSAGE_CALLBACK_LOG, sourceStr, typeStr, message);
+        SP_LOG_WARN(SP_OPENGL_MESSAGE_CALLBACK_LOG, sourceStr, typeStr, message);
         break;
       case GL_DEBUG_SEVERITY_LOW:
-        SP_LOG_INFO(BV_OPENGL_MESSAGE_CALLBACK_LOG, sourceStr, typeStr, message);
+        SP_LOG_INFO(SP_OPENGL_MESSAGE_CALLBACK_LOG, sourceStr, typeStr, message);
         break;
       case GL_DEBUG_SEVERITY_NOTIFICATION:
-        SP_LOG_TRACE(BV_OPENGL_MESSAGE_CALLBACK_LOG, sourceStr, typeStr, message);
+        SP_LOG_TRACE(SP_OPENGL_MESSAGE_CALLBACK_LOG, sourceStr, typeStr, message);
         break;
     }
   }
