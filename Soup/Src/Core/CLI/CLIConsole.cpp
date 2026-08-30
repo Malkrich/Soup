@@ -2,14 +2,21 @@
 
 #include "Core/Log/LogCore.h"
 
+// Prevents warnings from the external header
+#pragma warning(push, 0)
+#include <spdlog/spdlog.h>
+#pragma warning(pop)
+#include <spdlog/common.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+
 namespace Soup
 {
 
   CLIConsole::CLIConsole(const std::string& consoleName)
-    : m_Logger(consoleName)
   {
-    m_Logger.SetLevel(Logger::Level::Info);
-    m_Logger.SetPattern("%^%v%$");
+    m_Logger = spdlog::stdout_color_mt("Soup");
+    m_Logger->set_level(spdlog::level::info);
+    m_Logger->set_pattern("%^%v%$");
   }
 
   std::string CLIConsole::GetInputImpl(const std::string& string)
