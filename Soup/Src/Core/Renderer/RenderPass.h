@@ -29,6 +29,7 @@ namespace Soup
     virtual void Begin() = 0;
     virtual void End() = 0;
 
+    virtual const RenderPassSpecifications& GetSpecifications() const = 0;
     virtual Ref<FrameBuffer> GetFrameBuffer() = 0;
     virtual Ref<Pipeline> GetPipeline() = 0;
 

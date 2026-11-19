@@ -21,6 +21,17 @@ namespace Soup
     return entity;
   }
 
+  Entity Scene::CreateCameraEntity(Ref<Camera> camera, bool makeActive)
+  {
+    Entity entity = CreatePositionableEntity();
+    entity.AddComponent<CameraComponent>(camera);
+    if (makeActive)
+    {
+      m_ActiveCamera = camera;
+    }
+    return entity;
+  }
+
   Entity Scene::CreateMeshEntity(Ref<Mesh> mesh)
   {
     return CreateMeshEntity(mesh, glm::vec3(0.0f), RendererMaterial());
@@ -84,5 +95,7 @@ namespace Soup
     SP_ASSERT(m_Registry.valid((entt::entity)entityId), "Invalid entity to remove!");
     return Entity((entt::entity)entityId, this);
   }
+
+  void OnUpdate() {}
 
 }

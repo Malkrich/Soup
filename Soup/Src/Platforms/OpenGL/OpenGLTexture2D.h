@@ -13,21 +13,27 @@ namespace Soup
 
     OpenGLTexture2D(const Texture2DSpecifications& specs, uint32_t width, uint32_t height, void* data = nullptr);
 
-    static Ref<OpenGLTexture2D> copy(
+    static Ref<OpenGLTexture2D> Copy(
       const Texture2DSpecifications& specs, uint32_t textureSource, uint32_t width, uint32_t height);
 
-    virtual ~OpenGLTexture2D();
+    ~OpenGLTexture2D();
 
     void Bind(uint32_t slot = 0) const;
 
-    virtual uint32_t GetWidth() const override { return m_Width; }
-    virtual uint32_t GetHeight() const override { return m_Height; }
+    uint32_t GetWidth() const override { return m_Width; }
+    uint32_t GetHeight() const override { return m_Height; }
 
-    virtual uint32_t GetHandle() const override { return m_TextureID; }
+    uint32_t GetHandle() const override { return m_TextureID; }
 
-    virtual const Texture2DSpecifications& GetSpecifications() const override { return m_Specs; }
+    const Texture2DSpecifications& GetSpecifications() const override { return m_Specs; }
 
-    virtual void Resize(uint32_t width, uint32_t height) override;
+    void Resize(uint32_t width, uint32_t height) override;
+
+    /**
+     * Read the pixel at the given coordinates as integer. Pixel origin is at the bottom left.
+     * Return 0 if the pixel coordinates are out of bounds or if the texture format is not valid.
+     */
+    int32_t GetPixelInteger(uint32_t x, uint32_t y) const override;
 
   private:
     void Invalidate(const void* data);

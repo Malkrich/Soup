@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Geometry/Mesh.h"
+#include "Renderer/Camera.h"
 #include "Renderer/GpuMesh.h"
 #include "Renderer/RendererMaterial.h"
 
@@ -32,6 +33,18 @@ namespace Soup
     }
   };
 
+  struct CameraComponent
+  {
+    Ref<Camera> CameraInstance = nullptr;
+
+    CameraComponent() = default;
+    CameraComponent(const CameraComponent&) = default;
+    CameraComponent(Ref<Camera> camera)
+      : CameraInstance(camera)
+    {
+    }
+  };
+
   struct MeshComponent
   {
     Ref<GpuMesh> MeshData = nullptr;
@@ -39,6 +52,14 @@ namespace Soup
     MeshComponent(Ref<Mesh> mesh) { MeshData = CreateRef<GpuMesh>(mesh); }
     MeshComponent() = default;
     MeshComponent(const MeshComponent&) = default;
+  };
+
+  struct MeshInstanceComponent
+  {
+    Ref<GpuMesh> Mesh = nullptr;
+
+    MeshInstanceComponent() = default;
+    MeshInstanceComponent(const MeshInstanceComponent&) = default;
   };
 
   struct LightComponent

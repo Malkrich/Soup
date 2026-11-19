@@ -24,8 +24,6 @@
 #define SP_CONCAT_INTERNAL(a, b) a##b
 #define SP_CONCAT(a, b) SP_CONCAT_INTERNAL(a, b)
 
-#define SP_BIND_EVENT_FUNCTION(function) std::bind(&function, this, std::placeholders::_1)
-
 #define SP_STRUCT_PADDING(count) float SP_CONCAT(__padding_, __LINE__)[count] = {}
 
 #ifdef SP_DEBUG

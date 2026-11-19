@@ -91,23 +91,37 @@ namespace Soup
   public:
     SceneRenderer(uint32_t viewportWidth, uint32_t viewportHeight);
 
-    // Viewport and entities
+    /**
+     * Return the rendered color image.
+     */
     Ref<Texture2D> GetRenderedImage() const { return m_RenderedImage; }
-    int32_t GetEntityIDAt(uint32_t mouseX, uint32_t mouseY) const;
+
+    /**
+     * Return the image containing the entity ID for each pixel.
+     */
+    Ref<Texture2D> GetEntityIDImage() const { return m_EntityIdImage; }
+
+    Settings& GetRendererSettings() { return m_RendererSettings; }
+
+    /**
+     * Resize the renderer viewport.
+     */
     void ResizeViewport(uint32_t width, uint32_t height);
 
     /**
      * Render scene content.
      */
-    void Render(const PerspectiveCamera& camera, Ref<Scene> scene);
+    void Render(Ref<Scene> scene);
 
-    // Set the IBL environment texture
-    void SetEnvironment(Ref<Texture2D> hdriTexture, const EnvironmentCreateInfo& environmentCreateInfo);
+    /**
+     * Create the environment based on the given HDRI texture and the creation parameters.
+     */
+    void CreateEnvironment(Ref<Texture2D> hdriTexture, const EnvironmentCreateInfo& environmentCreateInfo);
 
-    // Environment
+    /**
+     * Set the environment data for the frame.
+     */
     void SetSceneEnvironment(const PerspectiveCamera& camera, const SceneLightsData& env);
-
-    Settings& GetRendererSettings() { return m_RendererSettings; }
 
     void SetSelectedEntity(Entity e) { m_SelectedEntity = e; }
 
@@ -147,8 +161,9 @@ namespace Soup
 
     // Render passes
     Ref<Texture2D> m_RenderedImage = nullptr;
+    Ref<Texture2D> m_EntityIdImage = nullptr;
     Ref<RenderPass> m_EntityOutlineRenderPass = nullptr;
-    Ref<RenderPass> m_PbrRenderPass = nullptr;
+    Ref<RenderPass> m_MeshRenderPass = nullptr;
     Ref<RenderPass> m_InstanceRenderPass = nullptr;
     Ref<RenderPass> m_LightsRenderPass = nullptr;
     Ref<RenderPass> m_LinesRenderPass = nullptr;
@@ -163,10 +178,12 @@ namespace Soup
     Ref<UniformBuffer> m_MeshDataUbo = nullptr;
 
     // Materials
-    PBRMaterialUbo m_PBRMaterialUboStruct;
-    Ref<UniformBuffer> m_PBRMaterialUbo = nullptr;
     WireframeMaterialUbo m_WireframeMaterialUboStruct;
     Ref<UniformBuffer> m_WireframeMaterialUbo = nullptr;
+    PBRMaterialUbo m_PBRMaterialUboStruct;
+    Ref<UniformBuffer> m_PBRMaterialUbo = nullptr;
+    SolidMaterialUbo m_SolidMaterialUboStruct;
+    Ref<UniformBuffer> m_SolidMaterialUbo = nullptr;
 
     // Meshes
     std::vector<MeshSubmissionData> m_MeshSubmissions;

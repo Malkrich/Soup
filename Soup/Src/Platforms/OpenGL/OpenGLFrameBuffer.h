@@ -15,26 +15,23 @@ namespace Soup
     void Bind() const;
     void Unbind() const;
 
-    virtual void Resize(uint32_t width, uint32_t height) override;
-    virtual uint32_t GetWidth() const override { return m_Width; }
-    virtual uint32_t GetHeight() const override { return m_Height; }
+    void Resize(uint32_t width, uint32_t height) override;
+    uint32_t GetWidth() const override { return m_Width; }
+    uint32_t GetHeight() const override { return m_Height; }
 
-    virtual const FrameBufferAttachmentSpecs& GetColorAttachmentSpecs(uint32_t attachmentIndex) const override
+    const FrameBufferAttachmentSpecs& GetColorAttachmentSpecs(uint32_t attachmentIndex) const override
     {
       return m_ColorAttachmentsSpecs[attachmentIndex];
     }
-    virtual const FrameBufferAttachmentSpecs& GetDepthAttachmentSpecs() const override
-    {
-      return m_DepthAttachmentSpecs;
-    }
+    const FrameBufferAttachmentSpecs& GetDepthAttachmentSpecs() const override { return m_DepthAttachmentSpecs; }
 
-    virtual void ClearAttachmentsIfNeeded() override;
-    virtual int32_t ReadPixel(uint32_t attachmentIndex, uint32_t mouseX, uint32_t mouseY) const override;
+    void SetClearColorAttachment(uint32_t index, bool clear) override;
+    void ClearAttachmentsIfNeeded() override;
 
-    virtual uint32_t GetColorAttachment(uint32_t index) const override;
-    virtual void SetColorAttachment(uint32_t index, Ref<Texture> texture) override;
+    uint32_t GetColorAttachment(uint32_t index) const override;
+    void SetColorAttachment(uint32_t index, Ref<Texture> texture) override;
 
-    virtual void AttachCubemapFace(uint32_t attachmentIndex, CubemapFace face, uint32_t mipmapLevel = 0) override;
+    void AttachCubemapFace(uint32_t attachmentIndex, CubemapFace face, uint32_t mipmapLevel = 0) override;
 
   private:
     void Invalidate();

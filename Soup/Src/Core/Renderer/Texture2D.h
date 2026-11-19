@@ -30,7 +30,16 @@ namespace Soup
 
     virtual const Texture2DSpecifications& GetSpecifications() const = 0;
 
+    /**
+     * Resize the texture width and height.
+     * Invalidate the current buffer handle to create a new one.
+     */
     virtual void Resize(uint32_t width, uint32_t height) = 0;
+
+    /**
+     * Read the pixel at the given coordinates as integer.
+     */
+    virtual int32_t GetPixelInteger(uint32_t x, uint32_t y) const = 0;
   };
 
 }

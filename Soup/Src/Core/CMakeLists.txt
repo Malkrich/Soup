@@ -31,7 +31,6 @@ list(APPEND sources
     # Log
     ${core_dir}/Log/ApplicationLogger.cpp
     ${core_dir}/Log/LogCore.cpp
-    ${core_dir}/Log/Logger.cpp
 
     # Layer
     ${core_dir}/Layer/LayerStack.cpp
@@ -55,7 +54,6 @@ list(APPEND headers
     # Log
     ${core_dir}/Log/ApplicationLogger.h
     ${core_dir}/Log/LogCore.h
-    ${core_dir}/Log/Logger.h
 
     # Memory
     ${core_dir}/Memory/Buffer.h
@@ -79,13 +77,21 @@ list(APPEND sources
 list(APPEND headers
     ${geometry_dir}/Mesh.h)
 
-# Gui
+# GUI
 set(gui_dir ${CMAKE_CURRENT_SOURCE_DIR}/GUI)
 list(APPEND sources
-    ${gui_dir}/ImGuiLayer.cpp)
+    ${gui_dir}/Gizmo.cpp
+    ${gui_dir}/ImGuiLayer.cpp
+    ${gui_dir}/Panel.cpp
+    ${gui_dir}/PanelManager.cpp
+    ${gui_dir}/StyleVariable.cpp)
 
 list(APPEND headers
-    ${gui_dir}/ImGuiLayer.h)
+    ${gui_dir}/Gizmo.h
+    ${gui_dir}/ImGuiLayer.h
+    ${gui_dir}/Panel.h
+    ${gui_dir}/PanelManager.h
+    ${gui_dir}/StyleVariable.h)
 
 # IO
 set(io_dir ${CMAKE_CURRENT_SOURCE_DIR}/IO)
@@ -113,7 +119,6 @@ list(APPEND sources
 
     # Root
     ${renderer_dir}/Camera.cpp
-    ${renderer_dir}/CameraController.cpp
     ${renderer_dir}/FrameBuffer.cpp
     ${renderer_dir}/GpuMesh.cpp
     ${renderer_dir}/GraphicsContext.cpp
@@ -138,7 +143,6 @@ list(APPEND headers
 
     # Root
     ${renderer_dir}/Camera.h
-    ${renderer_dir}/CameraController.h
     ${renderer_dir}/FrameBuffer.h
     ${renderer_dir}/GpuMesh.h
     ${renderer_dir}/GraphicsContext.h
@@ -164,10 +168,12 @@ list(APPEND headers
 # Scene
 set(scene_dir ${CMAKE_CURRENT_SOURCE_DIR}/Scene)
 list(APPEND sources
+    ${scene_dir}/CameraController.cpp
     ${scene_dir}/Entity.cpp
     ${scene_dir}/Scene.cpp)
 
 list(APPEND headers
+    ${scene_dir}/CameraController.h
     ${scene_dir}/Components.h
     ${scene_dir}/Entity.h
     ${scene_dir}/Scene.h)

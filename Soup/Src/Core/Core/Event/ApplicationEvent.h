@@ -12,6 +12,8 @@ namespace Soup
 
     WRITE_EVENT_TYPE(EventType::WindowClose)
     WRITE_EVENT_CATEGORY(EventCategoryApplication)
+
+    std::string ToString() const override { return "Window closed"; }
   };
 
   class WindowResizeEvent : public Event
@@ -28,6 +30,11 @@ namespace Soup
 
     WRITE_EVENT_TYPE(EventType::WindowResize)
     WRITE_EVENT_CATEGORY(EventCategoryApplication)
+
+    std::string ToString() const override
+    {
+      return std::format("Window resized: [{}, {}]", m_Width, m_Height);
+    }
 
   private:
     uint32_t m_Width, m_Height;

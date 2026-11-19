@@ -60,6 +60,9 @@ namespace Soup
 
   void OpenGLRendererAPI::BeginRenderPass(Ref<RenderPass> renderPass)
   {
+    SP_ASSERT(!m_ActiveRenderPass, "Render pass {} is still active and wasn't ended!",
+      m_ActiveRenderPass->GetSpecifications().Name);
+
     m_ActiveRenderPass = renderPass;
     m_ActiveRenderPass->Begin();
   }
@@ -254,7 +257,7 @@ namespace Soup
       frameBufferSpecs.Attachments[0].ExistingAttachment = environment.EnvironmentMap;
       frameBufferSpecs.Attachments[0].Cubemap = true;
       frameBufferSpecs.Attachments[0].Resizable = false;
-      frameBufferSpecs.Attachments[1].ClearAttachemnt = true;
+      frameBufferSpecs.Attachments[1].ClearAttachment = true;
       Ref<FrameBuffer> cubemapFacesFrameBuffer = FrameBuffer::Create(frameBufferSpecs);
 
       RenderPassSpecifications renderPassSpecs;

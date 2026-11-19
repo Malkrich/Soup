@@ -3,7 +3,6 @@
 #include "Core/Core.h"
 #include "Core/Memory/Buffer.h"
 #include "Core/Memory/BufferStreamWriter.h"
-#include "RendererMaterial.h"
 
 #include <glm/glm.hpp>
 
@@ -39,7 +38,9 @@ namespace Soup
   struct InstanceVertex
   {
     int EntityID = -1;
-    RendererMaterial Material;
+    glm::vec4 Albedo = { 1.0f, 1.0f, 1.0f, 1.0f };
+    float Roughness = 1.0;
+    float Metalness = 0.0;
     glm::mat4 Transform = glm::mat4(1.0f);
   };
 
@@ -64,14 +65,21 @@ namespace Soup
   };
 
   // Materials
-  struct PBRMaterialUbo
-  {
-    RendererMaterial Material;
-  };
-
   struct WireframeMaterialUbo
   {
     glm::vec3 Color = { 1.0f, 1.0f, 1.0f };
+  };
+
+  struct SolidMaterialUbo
+  {
+    glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+  };
+
+  struct PBRMaterialUbo
+  {
+    glm::vec4 Albedo = { 1.0f, 1.0f, 1.0f, 1.0f };
+    float Roughness = 1.0;
+    float Metalness = 0.0;
   };
 
   // Environment

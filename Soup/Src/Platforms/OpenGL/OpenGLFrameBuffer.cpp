@@ -195,12 +195,22 @@ namespace Soup
     }
   }
 
+  void OpenGLFrameBuffer::SetClearColorAttachment(uint32_t index, bool clear)
+  {
+    if (index >= m_ColorAttachmentsSpecs.size())
+    {
+      SP_LOG_ERROR("Given color attachement index is out of bound, aborting.");
+      return;
+    }
+    m_ColorAttachmentsSpecs[index].ClearAttachment = clear;
+  }
+
   void OpenGLFrameBuffer::ClearAttachmentsIfNeeded()
   {
     for (size_t i = 0; i < m_ColorAttachmentsSpecs.size(); i++)
     {
       const FrameBufferAttachmentSpecs& colorAttachment = m_ColorAttachmentsSpecs[i];
-      if (colorAttachment.ClearAttachemnt)
+      if (colorAttachment.ClearAttachment)
       {
         switch (colorAttachment.Format)
         {
@@ -228,7 +238,7 @@ namespace Soup
       }
     }
 
-    if (m_DepthAttachmentSpecs.ClearAttachemnt)
+    if (m_DepthAttachmentSpecs.ClearAttachment)
     {
       switch (m_DepthAttachmentSpecs.Format)
       {
@@ -245,6 +255,7 @@ namespace Soup
     }
   }
 
+#if 0
   int32_t OpenGLFrameBuffer::ReadPixel(uint32_t attachmentIndex, uint32_t mouseX, uint32_t mouseY) const
   {
     SP_ASSERT(attachmentIndex < m_ColorAttachmentsSpecs.size(), "Index {} for color attachment is out of bound!",
@@ -261,6 +272,7 @@ namespace Soup
 
     return data;
   }
+#endif
 
   void OpenGLFrameBuffer::AttachCubemapFace(uint32_t attachmentIndex, CubemapFace face, uint32_t mipmapLevel)
   {

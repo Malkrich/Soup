@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Geometry/Mesh.h"
+#include "Renderer/Camera.h"
 #include "Renderer/RendererMaterial.h"
 
 #include <entt.hpp>
@@ -23,6 +24,12 @@ namespace Soup
      * Create an entity with a transform component
      */
     Entity CreatePositionableEntity();
+
+    /**
+     * Create an entity with a camera component.
+     * If make active is set to true, the camera will be set as the active camera.
+     */
+    Entity CreateCameraEntity(Ref<Camera> camera, bool makeActive = false);
 
     ///@{
     /**
@@ -61,6 +68,16 @@ namespace Soup
     Entity GetEntity(uint32_t entityId);
 
     /**
+     * Return the camera that is currently used to render the scene.
+     */
+    Ref<Camera> GetActiveCamera() { return m_ActiveCamera; }
+
+    /**
+     * Handles entities update for one frame.
+     */
+    void OnUpdate();
+
+    /**
      * Call the functor to all entities that have the given components
      */
     template <typename... Components>
@@ -91,6 +108,8 @@ namespace Soup
 
   private:
     entt::registry m_Registry;
+
+    Ref<Camera> m_ActiveCamera = nullptr;
 
     friend class Entity;
   };

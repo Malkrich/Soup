@@ -18,23 +18,23 @@ namespace Soup
     template <typename... Args>
     void PrintLine(std::format_string<Args...> formattedString, Args&&... args)
     {
-      m_Logger.PrintInfo(formattedString, std::forward<Args>(args)...);
+      m_Logger->info(formattedString, std::forward<Args>(args)...);
     }
-    void PrintLine(const std::string& message) { m_Logger.PrintInfo("{}", message); }
+    void PrintLine(const std::string& message) { m_Logger->info("{}", message); }
 
     template <typename... Args>
     void PrintError(std::format_string<Args...> formattedString, Args&&... args)
     {
-      m_Logger.PrintError(formattedString, std::forward<Args>(args)...);
+      m_Logger->error(formattedString, std::forward<Args>(args)...);
     }
 
-    void BreakLine() { m_Logger.BreakLine(); }
+    void BreakLine() { PrintLine(""); }
 
   private:
     std::string GetInputImpl(const std::string& string);
 
   private:
-    Logger m_Logger;
+    std::shared_ptr<spdlog::logger> m_Logger = nullptr;
   };
 
 }

@@ -21,6 +21,8 @@ namespace Soup
     WRITE_EVENT_TYPE(EventType::MouseMoved)
     WRITE_EVENT_CATEGORY(EventCategoryInput | EventCategoryMouse)
 
+    std::string ToString() const override { return std::format("Mouse moved: {}, {}", m_PosX, m_PosY); }
+
   private:
     uint32_t m_PosX, m_PosY;
   };
@@ -51,6 +53,8 @@ namespace Soup
     }
 
     WRITE_EVENT_TYPE(EventType::MousePressed)
+
+    std::string ToString() const override { return std::format("Mouse pressed: {}", (uint32_t)GetMouseButton()); }
   };
 
   class MouseReleasedEvent : public MouseButtonEvent
@@ -62,6 +66,8 @@ namespace Soup
     }
 
     WRITE_EVENT_TYPE(EventType::MouseReleased)
+
+    std::string ToString() const override { return std::format("Mouse released: {}", (uint32_t)GetMouseButton()); }
   };
 
   class MouseScrolledEvent : public Event
@@ -78,6 +84,8 @@ namespace Soup
 
     WRITE_EVENT_TYPE(EventType::MouseScrolled)
     WRITE_EVENT_CATEGORY(EventCategoryInput | EventCategoryMouse)
+
+    std::string ToString() const override { return std::format("Mouse scrolled: {}, {}", m_OffsetX, m_OffsetY); }
 
   private:
     double m_OffsetX, m_OffsetY;
