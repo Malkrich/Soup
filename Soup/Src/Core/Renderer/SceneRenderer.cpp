@@ -1,6 +1,8 @@
 #include "SceneRenderer.h"
 
-#include "IO/MeshImporter.h"
+#include "Asset/AssetManager.h"
+#include "Geometry/Mesh.h"
+#include "Geometry/MeshFactory.h"
 #include "RenderPass.h"
 #include "Renderer.h"
 #include "VertexBuffer.h"
@@ -14,47 +16,32 @@ namespace Soup
 
   void SceneRenderer::Init(uint32_t viewportWidth, uint32_t viewportHeight)
   {
-    // Shaders
-    {
-      std::filesystem::path shaderBaseDir = "./data/Shaders/";
-
-      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "WireframeMesh.glsl");
-      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "PBRMesh.glsl");
-      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "SolidMesh.glsl");
-      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "PBRInstanceMesh.glsl");
-      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "SolidInstanceMesh.glsl");
-
-      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "EquirectangularToCubemap.glsl");
-      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "IrradianceMap.glsl");
-      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "PreFilteredMap.glsl");
-      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "BrdfLUTMap.glsl");
-      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "Skybox.glsl");
-
-      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "Light.glsl");
-
-      Renderer::GetShaderLibrary()->Load(shaderBaseDir / "Line.glsl");
-    }
-
     // Rendered image
     {
       Texture2DSpecifications textureSpecs;
+      textureSpecs.Width = viewportWidth;
+      textureSpecs.Height = viewportHeight;
       textureSpecs.Format = TextureFormat::RGBA;
-      m_RenderedImage = Texture2D::Create(textureSpecs, viewportWidth, viewportHeight);
+      m_RenderedImage = Texture2D::Create(textureSpecs);
     }
 
     // Depth attachment
     Ref<Texture2D> depthAttachment = nullptr;
     {
       Texture2DSpecifications textureSpecs;
+      textureSpecs.Width = viewportWidth;
+      textureSpecs.Height = viewportHeight;
       textureSpecs.Format = TextureFormat::Depth;
-      depthAttachment = Texture2D::Create(textureSpecs, viewportWidth, viewportHeight);
+      depthAttachment = Texture2D::Create(textureSpecs);
     }
 
     // Entity id attachment
     {
       Texture2DSpecifications entityIdImageSpecs;
+      entityIdImageSpecs.Width = viewportWidth;
+      entityIdImageSpecs.Height = viewportHeight;
       entityIdImageSpecs.Format = TextureFormat::R8;
-      m_EntityIdImage = Texture2D::Create(entityIdImageSpecs, viewportWidth, viewportHeight);
+      m_EntityIdImage = Texture2D::Create(entityIdImageSpecs);
     }
 
     // Camera
@@ -118,7 +105,7 @@ namespace Soup
       std::vector<LightVertex> lightMeshVertices;
       std::vector<TriangleFace> lightMeshIndices;
       {
-        Ref<Mesh> lightSourceMesh = MeshImporter::Import("data/Meshes/Cube.obj");
+        Ref<Mesh> lightSourceMesh = MeshFactory::CreateCube();
         lightSourceMesh->Scale(0.01f);
 
         // Vertices
@@ -373,6 +360,16 @@ namespace Soup
         SubmitMesh(mesh, transform, material, entityId);
       });
 
+    scene->EntityView<TransformComponent, MeshInstanceComponent, MaterialComponent>(
+      [&](Entity entity)
+      {
+        uint32_t entityId = (uint32_t)entity;
+        const MeshInstanceComponent& meshInstance = entity.GetComponent<MeshInstanceComponent>();
+        const TransformComponent& transform = entity.GetComponent<TransformComponent>();
+        const MaterialComponent& material = entity.GetComponent<MaterialComponent>();
+        SubmitMeshInstance(meshInstance, transform, material, entityId);
+      });
+
     Render();
   }
 
@@ -423,10 +420,11 @@ namespace Soup
     m_InstanceRenderPass->SetInput(2, m_Environment.BrdfLUTTexture);
   }
 
-  void SceneRenderer::SubmitMeshInstance(
-    Ref<GpuMesh> mesh, const TransformComponent& transform, const MaterialComponent& material, uint32_t entityID)
+  void SceneRenderer::SubmitMeshInstance(const MeshInstanceComponent& meshInstance, const TransformComponent& transform,
+    const MaterialComponent& material, uint32_t entityID)
   {
-    std::vector<InstanceVertex>& instances = m_InstanceSubmissions[mesh];
+    std::vector<InstanceVertex>& instances = m_MeshInstanceSubmissions[meshInstance.MeshHandle];
+
     InstanceVertex instanceVertex;
     instanceVertex.EntityID = entityID;
     instanceVertex.Albedo = material.Material.Albedo;
@@ -434,13 +432,28 @@ namespace Soup
     instanceVertex.Roughness = material.Material.Roughness;
     instanceVertex.Transform = transform.GetTransform();
     instances.push_back(instanceVertex);
+
+    AddMeshSource(meshInstance.MeshHandle);
   }
 
   void SceneRenderer::SubmitMesh(const MeshComponent& mesh, const TransformComponent& transform,
     const MaterialComponent& material, uint32_t entityID)
   {
     glm::mat4 transformMatrix = transform.GetTransform();
-    m_MeshSubmissions.emplace_back(mesh.MeshData, transformMatrix, material.Material, entityID);
+    m_MeshSubmissions.emplace_back(mesh.MeshHandle, transformMatrix, material.Material, entityID);
+
+    AddMeshSource(mesh.MeshHandle);
+  }
+
+  void SceneRenderer::AddMeshSource(AssetHandle assetHandle)
+  {
+    auto it = m_MeshSources.find(assetHandle);
+    if (it == m_MeshSources.end())
+    {
+      Ref<Mesh> meshSource = AssetManager::GetAsset<Mesh>(assetHandle);
+      Ref<GpuMesh> gpuMesh = CreateRef<GpuMesh>(meshSource);
+      m_MeshSources.insert({ assetHandle, gpuMesh });
+    }
   }
 
   void SceneRenderer::Render()
@@ -479,10 +492,22 @@ namespace Soup
         0, m_RendererSettings.RenderingPreset != RendererPreset::Lighted);
 
       Renderer::BeginRenderPass(m_EntityOutlineRenderPass);
-      if (m_SelectedEntity && m_SelectedEntity.HasComponent<TransformComponent>() &&
-        m_SelectedEntity.HasComponent<MeshComponent>())
+      AssetHandle meshHandle = 0;
+      if (m_SelectedEntity && m_SelectedEntity.HasComponent<TransformComponent>())
       {
-        Ref<GpuMesh> mesh = m_SelectedEntity.GetComponent<MeshComponent>().MeshData;
+        if (m_SelectedEntity.HasComponent<MeshComponent>())
+        {
+          meshHandle = m_SelectedEntity.GetComponent<MeshComponent>().MeshHandle;
+        }
+        else if (m_SelectedEntity.HasComponent<MeshInstanceComponent>())
+        {
+          meshHandle = m_SelectedEntity.GetComponent<MeshInstanceComponent>().MeshHandle;
+        }
+      }
+
+      auto it = m_MeshSources.find(meshHandle);
+      if (it != m_MeshSources.end())
+      {
         m_MeshDataUboStructs.Transform = m_SelectedEntity.GetComponent<TransformComponent>().GetTransform();
         m_MeshDataUboStructs.EntityID = 0;
         m_MeshDataUbo->SetData(&m_MeshDataUboStructs);
@@ -490,7 +515,7 @@ namespace Soup
         m_WireframeMaterialUboStruct.Color = m_RendererSettings.OutlineColor;
         m_WireframeMaterialUbo->SetData(&m_WireframeMaterialUboStruct);
 
-        Renderer::RenderMesh(mesh, m_MeshDataUbo, m_WireframeMaterialUbo);
+        Renderer::RenderMesh(it->second, m_MeshDataUbo, m_WireframeMaterialUbo);
       }
       Renderer::EndRenderPass();
     }
@@ -514,43 +539,46 @@ namespace Soup
     // Mesh pass
     {
       Renderer::BeginRenderPass(m_MeshRenderPass);
-      for (const MeshSubmissionData& meshSub : m_MeshSubmissions)
+      for (const MeshSubmission& meshSubmission : m_MeshSubmissions)
       {
-        m_MeshDataUboStructs.Transform = meshSub.Transform;
-        m_MeshDataUboStructs.EntityID = meshSub.EntityID;
-        m_MeshDataUbo->SetData(&m_MeshDataUboStructs);
+        m_MeshDataUbo->SetData(&meshSubmission.MeshDataUboStruct);
 
         Ref<UniformBuffer> materialUbo = nullptr;
         switch (m_RendererSettings.RenderingPreset)
         {
           case RendererPreset::Solid:
-            m_SolidMaterialUboStruct.Color = meshSub.Material.Albedo;
+            m_SolidMaterialUboStruct.Color = meshSubmission.Material.Albedo;
             m_SolidMaterialUbo->SetData(&m_SolidMaterialUboStruct);
             materialUbo = m_SolidMaterialUbo;
             break;
           case RendererPreset::Lighted:
-            m_PBRMaterialUboStruct.Albedo = meshSub.Material.Albedo;
-            m_PBRMaterialUboStruct.Metalness = meshSub.Material.Metalness;
-            m_PBRMaterialUboStruct.Roughness = meshSub.Material.Roughness;
+            m_PBRMaterialUboStruct.Albedo = meshSubmission.Material.Albedo;
+            m_PBRMaterialUboStruct.Metalness = meshSubmission.Material.Metalness;
+            m_PBRMaterialUboStruct.Roughness = meshSubmission.Material.Roughness;
             m_PBRMaterialUbo->SetData(&m_PBRMaterialUboStruct);
             materialUbo = m_PBRMaterialUbo;
             break;
         }
         SP_ASSERT(materialUbo, "Material UBO not found for mesh rendering");
 
-        Renderer::RenderMesh(meshSub.Mesh, m_MeshDataUbo, materialUbo);
+        auto it = m_MeshSources.find(meshSubmission.MeshHandle);
+        SP_ASSERT(it != m_MeshSources.end(), "Could not find mesh source for handle {}", meshSubmission.MeshHandle);
+        Renderer::RenderMesh(it->second, m_MeshDataUbo, materialUbo);
       }
       Renderer::EndRenderPass();
     }
 
-    // Instance pass
+    // Mesh Instance pass
     {
       Renderer::BeginRenderPass(m_InstanceRenderPass);
 
-      for (const auto& [mesh, instanceVertices] : m_InstanceSubmissions)
+      for (const auto& [meshHandle, instanceVertices] : m_MeshInstanceSubmissions)
       {
         m_InstanceVbo->SetData(instanceVertices.size() * sizeof(InstanceVertex), instanceVertices.data());
-        Renderer::RenderMeshInstances(mesh, m_InstanceVbo, instanceVertices.size());
+
+        auto it = m_MeshSources.find(meshHandle);
+        SP_ASSERT(it != m_MeshSources.end(), "Could not find mesh source for handle {}", meshHandle);
+        Renderer::RenderMeshInstances(it->second, m_InstanceVbo, instanceVertices.size());
       }
       Renderer::EndRenderPass();
     }
@@ -577,8 +605,8 @@ namespace Soup
     }
 
     // TODO: optimize memory management across frames
-    m_InstanceSubmissions.clear();
     m_MeshSubmissions.clear();
+    m_MeshInstanceSubmissions.clear();
   }
 
   std::vector<Line> SceneRenderer::GenerateGrid(float gridBound, float gridStep)

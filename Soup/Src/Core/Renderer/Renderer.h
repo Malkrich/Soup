@@ -18,10 +18,17 @@ namespace Soup
   class Renderer
   {
   public:
+    /**
+     * Init the underlying data for the API.
+     * Does not initialize the renderer context at this point, call Renderer::InitAPI to initialize the context.
+     */
     static void Init(RendererAPI::API api);
-    static void Shutdown();
 
+    /**
+     * Initialize the context of the active renderer API.
+     */
     static void InitAPI();
+    static void Shutdown();
 
     static RendererAPI::API GetCurrentAPI();
 

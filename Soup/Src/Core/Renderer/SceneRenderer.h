@@ -24,23 +24,6 @@ namespace Soup
     Lighted
   };
 
-  struct MeshSubmissionData
-  {
-    Ref<GpuMesh> Mesh = nullptr;
-    glm::mat4 Transform = glm::mat4(1.0f);
-    RendererMaterial Material;
-    int EntityID = -1;
-
-    MeshSubmissionData() = default;
-    MeshSubmissionData(Ref<GpuMesh> mesh, const glm::mat4& transform, const RendererMaterial& material, int entityID)
-      : Mesh(mesh)
-      , Transform(transform)
-      , Material(material)
-      , EntityID(entityID)
-    {
-    }
-  };
-
   struct DirectionalLightData
   {
     bool Enable = false;
@@ -145,8 +128,10 @@ namespace Soup
      * Submit an instance of the given mesh.
      * The transforms are accumulated to a vector associated to the mesh pointer.
      */
-    void SubmitMeshInstance(
-      Ref<GpuMesh> mesh, const TransformComponent& transform, const MaterialComponent& material, uint32_t entityID);
+    void SubmitMeshInstance(const MeshInstanceComponent& meshInstance, const TransformComponent& transform,
+      const MaterialComponent& material, uint32_t entityID);
+
+    void AddMeshSource(AssetHandle assetHandle);
 
     std::vector<Line> GenerateGrid(float gridBound, float gridStep);
 
@@ -186,8 +171,23 @@ namespace Soup
     Ref<UniformBuffer> m_SolidMaterialUbo = nullptr;
 
     // Meshes
-    std::vector<MeshSubmissionData> m_MeshSubmissions;
-    std::unordered_map<Ref<GpuMesh>, std::vector<InstanceVertex>> m_InstanceSubmissions;
+    struct MeshSubmission
+    {
+      AssetHandle MeshHandle = 0;
+      MeshDataUbo MeshDataUboStruct;
+      RendererMaterial Material;
+
+      MeshSubmission() = default;
+      MeshSubmission(AssetHandle meshHandle, const glm::mat4& transform, const RendererMaterial& material, int entityID)
+        : MeshHandle(meshHandle)
+        , MeshDataUboStruct(transform, entityID)
+        , Material(material)
+      {
+      }
+    };
+    std::unordered_map<AssetHandle, Ref<GpuMesh>> m_MeshSources;
+    std::vector<MeshSubmission> m_MeshSubmissions;
+    std::unordered_map<AssetHandle, std::vector<InstanceVertex>> m_MeshInstanceSubmissions;
     Ref<VertexBuffer> m_InstanceVbo = nullptr;
 
     // Skybox
