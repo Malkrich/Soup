@@ -47,17 +47,24 @@ namespace Soup
 
   struct MeshComponent
   {
-    Ref<GpuMesh> MeshData = nullptr;
+    AssetHandle MeshHandle = 0;
 
-    MeshComponent(Ref<Mesh> mesh) { MeshData = CreateRef<GpuMesh>(mesh); }
+    MeshComponent(AssetHandle handle)
+      : MeshHandle(handle)
+    {
+    }
     MeshComponent() = default;
     MeshComponent(const MeshComponent&) = default;
   };
 
   struct MeshInstanceComponent
   {
-    Ref<GpuMesh> Mesh = nullptr;
+    AssetHandle MeshHandle = 0;
 
+    MeshInstanceComponent(AssetHandle handle)
+      : MeshHandle(handle)
+    {
+    }
     MeshInstanceComponent() = default;
     MeshInstanceComponent(const MeshInstanceComponent&) = default;
   };
