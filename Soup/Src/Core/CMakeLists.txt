@@ -111,13 +111,12 @@ list(APPEND headers
 # IO
 set(io_dir ${CMAKE_CURRENT_SOURCE_DIR}/IO)
 list(APPEND headers
-    ${io_dir}/MeshImporter.h
     ${io_dir}/MeshReader.h
-    ${io_dir}/ObjMeshReader.h)
+    ${io_dir}/TextureReader.h)
 
 list(APPEND sources
-    ${io_dir}/MeshImporter.cpp
-    ${io_dir}/ObjMeshReader.cpp)
+    ${io_dir}/MeshReader.cpp
+    ${io_dir}/TextureReader.cpp)
 
 # Metric
 set(metric_dir ${CMAKE_CURRENT_SOURCE_DIR}/Metric)

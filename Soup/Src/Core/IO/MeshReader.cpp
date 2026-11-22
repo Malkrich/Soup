@@ -1,15 +1,17 @@
-#include "ObjMeshReader.h"
+#include "MeshReader.h"
+
+#include "Asset/Asset.h"
+#include "Geometry/Mesh.h"
 
 #include "tiny_obj_loader.h"
 
 namespace Soup
 {
 
-  bool ObjMeshReader::Read(const std::filesystem::path& filePath)
+  Ref<Asset> MeshReader::ImportObjMesh(const std::filesystem::path& filePath)
   {
     tinyobj::basic_attrib_t<> attributes;
     std::vector<tinyobj::basic_shape_t<>> shapes;
-    // std::vector<tinyobj::material_t> materials;
 
     std::string warning;
     std::string error;
@@ -32,7 +34,7 @@ namespace Soup
     {
       SP_LOG_ERROR("Obj import error:");
       SP_LOG_ERROR("{}", error);
-      return false;
+      return nullptr;
     }
 
     std::vector<Vertex> vertices;
@@ -84,10 +86,9 @@ namespace Soup
       }
     }
 
-    m_Mesh = CreateRef<Mesh>();
-    m_Mesh->SetData(vertices, indices);
-
-    return true;
+    Ref<Mesh> mesh = CreateRef<Mesh>();
+    mesh->SetData(vertices, indices);
+    return mesh;
   }
 
 }
