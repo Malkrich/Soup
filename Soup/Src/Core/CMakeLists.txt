@@ -122,6 +122,16 @@ set(metric_dir ${CMAKE_CURRENT_SOURCE_DIR}/Metric)
 list(APPEND headers
     ${metric_dir}/World.h)
 
+# Project
+set(project_dir ${CMAKE_CURRENT_SOURCE_DIR}/Project)
+list(APPEND headers
+    ${project_dir}/ProjectSerializer.h
+    ${project_dir}/Project.h)
+
+list(APPEND sources
+    ${project_dir}/ProjectSerializer.cpp
+    ${project_dir}/Project.cpp)
+
 # Renderer
 set(renderer_dir ${CMAKE_CURRENT_SOURCE_DIR}/Renderer)
 list(APPEND sources
