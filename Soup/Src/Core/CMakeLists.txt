@@ -1,6 +1,19 @@
 set(sources)
 set(headers)
 
+# Asset
+set(asset_dir ${CMAKE_CURRENT_SOURCE_DIR}/Asset)
+list(APPEND sources
+    ${asset_dir}/AssetManagerSystem.cpp
+    ${asset_dir}/MeshImporter.cpp)
+
+list(APPEND headers
+    ${asset_dir}/Asset.h
+    ${asset_dir}/AssetManager.h
+    ${asset_dir}/AssetManagerSystem.h
+    ${asset_dir}/Importer.h
+    ${asset_dir}/MeshImporter.h)
+
 # CLI
 set(cli_dir ${CMAKE_CURRENT_SOURCE_DIR}/CLI)
 list(APPEND public_includes ${cli_dir})
