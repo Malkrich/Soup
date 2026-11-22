@@ -85,10 +85,12 @@ list(APPEND headers
 # Geoemtry
 set(geometry_dir ${CMAKE_CURRENT_SOURCE_DIR}/Geometry)
 list(APPEND sources
-    ${geometry_dir}/Mesh.cpp)
+    ${geometry_dir}/Mesh.cpp
+    ${geometry_dir}/MeshFactory.cpp)
 
 list(APPEND headers
-    ${geometry_dir}/Mesh.h)
+    ${geometry_dir}/Mesh.h
+    ${geometry_dir}/MeshFactory.h)
 
 # GUI
 set(gui_dir ${CMAKE_CURRENT_SOURCE_DIR}/GUI)
