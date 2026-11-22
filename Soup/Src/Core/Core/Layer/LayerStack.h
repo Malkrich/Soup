@@ -9,6 +9,7 @@ namespace Soup
   {
   public:
     LayerStack() = default;
+    ~LayerStack();
 
     void PushLayer(Ref<Layer> layer);
     void PushOverlay(Ref<Layer> overlay);

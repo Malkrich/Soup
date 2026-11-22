@@ -16,8 +16,6 @@ list(APPEND headers
 
 # CLI
 set(cli_dir ${CMAKE_CURRENT_SOURCE_DIR}/CLI)
-list(APPEND public_includes ${cli_dir})
-
 list(APPEND sources
     ${cli_dir}/CLIArguments.cpp
     ${cli_dir}/CLICommands.cpp
@@ -34,13 +32,6 @@ list(APPEND headers
 set(core_dir ${CMAKE_CURRENT_SOURCE_DIR}/Core)
 list(APPEND sources
 
-    # Event
-    ${core_dir}/Event/ApplicationEvent.h
-    ${core_dir}/Event/CLIEvent.h
-    ${core_dir}/Event/Event.h
-    ${core_dir}/Event/KeyEvent.h
-    ${core_dir}/Event/MouseEvent.h
-
     # Log
     ${core_dir}/Log/ApplicationLogger.cpp
     ${core_dir}/Log/LogCore.cpp
@@ -56,9 +47,17 @@ list(APPEND sources
     ${core_dir}/Application.cpp
     ${core_dir}/Input.cpp
     ${core_dir}/Time.cpp
+    ${core_dir}/UUID.cpp
     ${core_dir}/Window.cpp)
 
 list(APPEND headers
+
+    # Event
+    ${core_dir}/Event/ApplicationEvent.h
+    ${core_dir}/Event/CLIEvent.h
+    ${core_dir}/Event/Event.h
+    ${core_dir}/Event/KeyEvent.h
+    ${core_dir}/Event/MouseEvent.h
 
     # Layer
     ${core_dir}/Layer/Layer.h
@@ -80,6 +79,7 @@ list(APPEND headers
     ${core_dir}/MouseButtons.h
     ${core_dir}/Input.h
     ${core_dir}/Time.h
+    ${core_dir}/UUID.h
     ${core_dir}/Window.h)
 
 # Geoemtry
@@ -134,6 +134,7 @@ list(APPEND sources
 
 # Renderer
 set(renderer_dir ${CMAKE_CURRENT_SOURCE_DIR}/Renderer)
+
 list(APPEND sources
 
     # Shader

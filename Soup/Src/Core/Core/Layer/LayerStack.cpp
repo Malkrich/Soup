@@ -3,6 +3,14 @@
 namespace Soup
 {
 
+  LayerStack::~LayerStack()
+  {
+    for (Ref<Layer> layer : m_LayerStack)
+    {
+      layer->OnDetach();
+    }
+  }
+
   void LayerStack::PushLayer(Ref<Layer> layer)
   {
     m_LayerStack.emplace(m_LayerStack.begin() + m_CurrentLayerPushIndex, layer);
