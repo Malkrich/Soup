@@ -1,10 +1,21 @@
 set(sources)
 set(headers)
 
+# Asset
+set(asset_dir ${CMAKE_CURRENT_SOURCE_DIR}/Asset)
+list(APPEND sources
+    ${asset_dir}/AssetManagerSystem.cpp
+    ${asset_dir}/MeshImporter.cpp)
+
+list(APPEND headers
+    ${asset_dir}/Asset.h
+    ${asset_dir}/AssetManager.h
+    ${asset_dir}/AssetManagerSystem.h
+    ${asset_dir}/Importer.h
+    ${asset_dir}/MeshImporter.h)
+
 # CLI
 set(cli_dir ${CMAKE_CURRENT_SOURCE_DIR}/CLI)
-list(APPEND public_includes ${cli_dir})
-
 list(APPEND sources
     ${cli_dir}/CLIArguments.cpp
     ${cli_dir}/CLICommands.cpp
@@ -21,13 +32,6 @@ list(APPEND headers
 set(core_dir ${CMAKE_CURRENT_SOURCE_DIR}/Core)
 list(APPEND sources
 
-    # Event
-    ${core_dir}/Event/ApplicationEvent.h
-    ${core_dir}/Event/CLIEvent.h
-    ${core_dir}/Event/Event.h
-    ${core_dir}/Event/KeyEvent.h
-    ${core_dir}/Event/MouseEvent.h
-
     # Log
     ${core_dir}/Log/ApplicationLogger.cpp
     ${core_dir}/Log/LogCore.cpp
@@ -43,9 +47,17 @@ list(APPEND sources
     ${core_dir}/Application.cpp
     ${core_dir}/Input.cpp
     ${core_dir}/Time.cpp
+    ${core_dir}/UUID.cpp
     ${core_dir}/Window.cpp)
 
 list(APPEND headers
+
+    # Event
+    ${core_dir}/Event/ApplicationEvent.h
+    ${core_dir}/Event/CLIEvent.h
+    ${core_dir}/Event/Event.h
+    ${core_dir}/Event/KeyEvent.h
+    ${core_dir}/Event/MouseEvent.h
 
     # Layer
     ${core_dir}/Layer/Layer.h
@@ -67,15 +79,18 @@ list(APPEND headers
     ${core_dir}/MouseButtons.h
     ${core_dir}/Input.h
     ${core_dir}/Time.h
+    ${core_dir}/UUID.h
     ${core_dir}/Window.h)
 
 # Geoemtry
 set(geometry_dir ${CMAKE_CURRENT_SOURCE_DIR}/Geometry)
 list(APPEND sources
-    ${geometry_dir}/Mesh.cpp)
+    ${geometry_dir}/Mesh.cpp
+    ${geometry_dir}/MeshFactory.cpp)
 
 list(APPEND headers
-    ${geometry_dir}/Mesh.h)
+    ${geometry_dir}/Mesh.h
+    ${geometry_dir}/MeshFactory.h)
 
 # GUI
 set(gui_dir ${CMAKE_CURRENT_SOURCE_DIR}/GUI)
@@ -96,21 +111,31 @@ list(APPEND headers
 # IO
 set(io_dir ${CMAKE_CURRENT_SOURCE_DIR}/IO)
 list(APPEND headers
-    ${io_dir}/MeshImporter.h
     ${io_dir}/MeshReader.h
-    ${io_dir}/ObjMeshReader.h)
+    ${io_dir}/TextureReader.h)
 
 list(APPEND sources
-    ${io_dir}/MeshImporter.cpp
-    ${io_dir}/ObjMeshReader.cpp)
+    ${io_dir}/MeshReader.cpp
+    ${io_dir}/TextureReader.cpp)
 
 # Metric
 set(metric_dir ${CMAKE_CURRENT_SOURCE_DIR}/Metric)
 list(APPEND headers
     ${metric_dir}/World.h)
 
+# Project
+set(project_dir ${CMAKE_CURRENT_SOURCE_DIR}/Project)
+list(APPEND headers
+    ${project_dir}/ProjectSerializer.h
+    ${project_dir}/Project.h)
+
+list(APPEND sources
+    ${project_dir}/ProjectSerializer.cpp
+    ${project_dir}/Project.cpp)
+
 # Renderer
 set(renderer_dir ${CMAKE_CURRENT_SOURCE_DIR}/Renderer)
+
 list(APPEND sources
 
     # Shader

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include "Asset/Asset.h"
 
-#include <filesystem>
+#include <glm/glm.hpp>
 
 namespace Soup
 {
@@ -60,10 +60,13 @@ namespace Soup
     std::array<uint32_t, 3> m_Indices;
   };
 
-  class Mesh
+  class Mesh : public Asset
   {
   public:
     Mesh() = default;
+    Mesh(const std::vector<Vertex>& vertices, const std::vector<TriangleFace>& indices);
+
+    AssetType GetAssetType() const override { return AssetType::Mesh; }
 
     bool IsEmpty() const { return m_Vertices.empty(); }
     const std::vector<Vertex>& GetVertices() const { return m_Vertices; }

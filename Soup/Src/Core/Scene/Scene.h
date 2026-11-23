@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Asset/Asset.h"
 #include "Geometry/Mesh.h"
 #include "Renderer/Camera.h"
 #include "Renderer/RendererMaterial.h"
@@ -37,10 +38,10 @@ namespace Soup
      * An initial position can be specified using overloaded functions.
      * A material component can also be attached by using overloaded functions.
      */
-    Entity CreateMeshEntity(Ref<Mesh> mesh);
-    Entity CreateMeshEntity(Ref<Mesh> mesh, const glm::vec3& position);
-    Entity CreateMeshEntity(Ref<Mesh> mesh, const RendererMaterial& material);
-    Entity CreateMeshEntity(Ref<Mesh> mesh, const glm::vec3& position, const RendererMaterial& material);
+    Entity CreateMeshEntity(AssetHandle assetHandle);
+    Entity CreateMeshEntity(AssetHandle assetHandle, const glm::vec3& position);
+    Entity CreateMeshEntity(AssetHandle assetHandle, const RendererMaterial& material);
+    Entity CreateMeshEntity(AssetHandle assetHandle, const glm::vec3& position, const RendererMaterial& material);
     ///@}
 
     ///@{

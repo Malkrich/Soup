@@ -18,39 +18,64 @@ namespace Soup
   void OpenGLRendererAPI::Init()
   {
     // Shaders
-    m_ShaderLib = CreateRef<ShaderLibrary>();
+    {
+      m_ShaderLib = CreateRef<ShaderLibrary>();
+
+      const std::filesystem::path shaderSourceDir(SP_SHADER_SOURCE_DIR);
+      m_ShaderLib->Load(shaderSourceDir / "WireframeMesh.glsl");
+      m_ShaderLib->Load(shaderSourceDir / "PBRMesh.glsl");
+      m_ShaderLib->Load(shaderSourceDir / "SolidMesh.glsl");
+      m_ShaderLib->Load(shaderSourceDir / "PBRInstanceMesh.glsl");
+      m_ShaderLib->Load(shaderSourceDir / "SolidInstanceMesh.glsl");
+
+      m_ShaderLib->Load(shaderSourceDir / "EquirectangularToCubemap.glsl");
+      m_ShaderLib->Load(shaderSourceDir / "IrradianceMap.glsl");
+      m_ShaderLib->Load(shaderSourceDir / "PreFilteredMap.glsl");
+      m_ShaderLib->Load(shaderSourceDir / "BrdfLUTMap.glsl");
+      m_ShaderLib->Load(shaderSourceDir / "Skybox.glsl");
+
+      m_ShaderLib->Load(shaderSourceDir / "Light.glsl");
+
+      m_ShaderLib->Load(shaderSourceDir / "Line.glsl");
+    }
 
     // Full screen quad
-    const std::vector<glm::vec2> fullScreenQuadVertices = { glm::vec2(-1.0f, -1.0f), glm::vec2(1.0f, -1.0f),
-      glm::vec2(1.0f, 1.0f), glm::vec2(-1.0f, 1.0f) };
-    const std::vector<uint32_t> fullScreenQuadIndices = { 0, 1, 2, 2, 3, 0 };
-    m_FullScreenQuad = GpuMesh::Create(fullScreenQuadVertices, fullScreenQuadIndices);
+    {
+      const std::vector<glm::vec2> fullScreenQuadVertices = { glm::vec2(-1.0f, -1.0f), glm::vec2(1.0f, -1.0f),
+        glm::vec2(1.0f, 1.0f), glm::vec2(-1.0f, 1.0f) };
+      const std::vector<uint32_t> fullScreenQuadIndices = { 0, 1, 2, 2, 3, 0 };
+      m_FullScreenQuad = GpuMesh::Create(fullScreenQuadVertices, fullScreenQuadIndices);
+    }
 
     // Skybox cube mesh
-    const std::vector<glm::vec3> skyboxCubeMeshVertices = { glm::vec3(-1.0f, -1.0f, -1.0f),
-      glm::vec3(1.0f, -1.0f, -1.0f), glm::vec3(1.0f, -1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, 1.0f),
-      glm::vec3(-1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, 1.0f, -1.0f), glm::vec3(1.0f, 1.0f, -1.0f),
-      glm::vec3(1.0f, 1.0f, 1.0f) };
-    const std::vector<uint32_t> skyboxCubeMeshIndices = { 1, 0, 2, 2, 0, 3, 5, 6, 7, 7, 4, 5, 3, 0, 5, 5, 4, 3, 4, 7, 2,
-      2, 3, 4, 1, 2, 7, 7, 6, 1, 0, 1, 6, 6, 5, 0 };
-    m_SkyboxCubeMesh = GpuMesh::Create(skyboxCubeMeshVertices, skyboxCubeMeshIndices);
+    {
+      const std::vector<glm::vec3> skyboxCubeMeshVertices = { glm::vec3(-1.0f, -1.0f, -1.0f),
+        glm::vec3(1.0f, -1.0f, -1.0f), glm::vec3(1.0f, -1.0f, 1.0f), glm::vec3(-1.0f, -1.0f, 1.0f),
+        glm::vec3(-1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, 1.0f, -1.0f), glm::vec3(1.0f, 1.0f, -1.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f) };
+      const std::vector<uint32_t> skyboxCubeMeshIndices = { 1, 0, 2, 2, 0, 3, 5, 6, 7, 7, 4, 5, 3, 0, 5, 5, 4, 3, 4, 7,
+        2, 2, 3, 4, 1, 2, 7, 7, 6, 1, 0, 1, 6, 6, 5, 0 };
+      m_SkyboxCubeMesh = GpuMesh::Create(skyboxCubeMeshVertices, skyboxCubeMeshIndices);
+    }
 
     // Cubemap camera data
-    m_CubemapCaptureProjectionMatrix = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-    m_CubemapCaptureViewMatrices = {
-      { CubemapFace::PositiveX,
-        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)) },
-      { CubemapFace::NegativeX,
-        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)) },
-      { CubemapFace::PositiveY,
-        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)) },
-      { CubemapFace::NegativeY,
-        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)) },
-      { CubemapFace::PositiveZ,
-        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)) },
-      { CubemapFace::NegativeZ,
-        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)) }
-    };
+    {
+      m_CubemapCaptureProjectionMatrix = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+      m_CubemapCaptureViewMatrices = {
+        { CubemapFace::PositiveX,
+          glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)) },
+        { CubemapFace::NegativeX,
+          glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)) },
+        { CubemapFace::PositiveY,
+          glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)) },
+        { CubemapFace::NegativeY,
+          glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)) },
+        { CubemapFace::PositiveZ,
+          glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)) },
+        { CubemapFace::NegativeZ,
+          glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)) }
+      };
+    }
 
 #ifdef SP_DEBUG
     glEnable(GL_DEBUG_OUTPUT);
@@ -235,10 +260,12 @@ namespace Soup
     // Brdf LUT map
     {
       Texture2DSpecifications textureSpecs;
+      textureSpecs.Width = environmentCreateInfo.BrdfLUTMapDimXY;
+      textureSpecs.Height = environmentCreateInfo.BrdfLUTMapDimXY;
       textureSpecs.Format = environmentCreateInfo.BrdfLUTTextureFormat;
       textureSpecs.WrappingModeU = TextureWrapMode::ClampToEdge;
       textureSpecs.WrappingModeV = TextureWrapMode::ClampToEdge;
-      environment.BrdfLUTTexture = Texture2D::Create(textureSpecs, environmentCreateInfo.BrdfLUTMapDimXY);
+      environment.BrdfLUTTexture = Texture2D::Create(textureSpecs);
     }
 
     // Cubemap faces render pass

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Asset/Asset.h"
 #include "Texture.h"
 #include "TextureSpecifications.h"
 
@@ -8,6 +9,8 @@ namespace Soup
 
   struct Texture2DSpecifications
   {
+    uint32_t Width = 0;
+    uint32_t Height = 0;
     TextureFormat Format = TextureFormat::RGB;
     TextureWrapMode WrappingModeU = TextureWrapMode::Repeat;
     TextureWrapMode WrappingModeV = TextureWrapMode::Repeat;
@@ -17,16 +20,16 @@ namespace Soup
     Texture2DSpecifications() = default;
   };
 
-  class Texture2D : public Texture
+  class Texture2D
+    : public Texture
+    , public Asset
   {
   public:
-    static Ref<Texture2D> Create(const Texture2DSpecifications specs, const std::filesystem::path& filePath);
-    static Ref<Texture2D> Create(const Texture2DSpecifications specs, uint32_t width, uint32_t height);
-    static Ref<Texture2D> Create(const Texture2DSpecifications specs, uint32_t dimensions);
+    static Ref<Texture2D> Create(const Texture2DSpecifications specs, void* data = nullptr);
 
-    static Ref<Texture2D> Copy(
-      const Texture2DSpecifications& specs, uint32_t sourceTexture, uint32_t width, uint32_t height);
-    static Ref<Texture2D> Copy(const Texture2DSpecifications& specs, uint32_t sourceTexture, uint32_t dimensions);
+    static Ref<Texture2D> Copy(const Texture2DSpecifications& specs, uint32_t sourceTexture);
+
+    AssetType GetAssetType() const override { return AssetType::Texture2D; }
 
     virtual const Texture2DSpecifications& GetSpecifications() const = 0;
 

@@ -19,15 +19,9 @@ namespace Soup
     }
   }
 
-  static std::unordered_map<std::string, ModelFileFormat> s_FileFormatMap = { { ".obj", ModelFileFormat::Obj },
-    { ".dat", ModelFileFormat::LDrawDat } };
-
-  static ModelFileFormat ModelFileFormatFromExtension(const std::string& extension)
+  Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<TriangleFace>& indices)
   {
-    if (s_FileFormatMap.find(extension) == s_FileFormatMap.end())
-      return ModelFileFormat::None;
-
-    return s_FileFormatMap.at(extension);
+    SetData(vertices, indices);
   }
 
   void Mesh::SetData(const std::vector<Vertex>& vertices, const std::vector<TriangleFace> connectivities)

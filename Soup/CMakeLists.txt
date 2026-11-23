@@ -29,6 +29,8 @@ target_include_directories(Soup PRIVATE
 target_link_libraries(Soup PUBLIC ${SP_VENDORS_PUBLIC_TARGETS})
 target_link_libraries(Soup PRIVATE ${SP_VENDORS_PRIVATE_TARGETS})
 
+target_compile_definitions(Soup PRIVATE "SP_SHADER_SOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/Src/Core/Renderer/Shader/ShaderSources\"")
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(Soup PUBLIC
         SP_DEBUG)

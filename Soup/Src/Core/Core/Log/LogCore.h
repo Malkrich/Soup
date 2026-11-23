@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Event/Event.h"
+#include "Core/UUID.h"
 #include "Utils/StringUtils.h"
 
 #include <glm/glm.hpp>
@@ -31,6 +32,7 @@ SP_FORMAT_CUSTOM_TYPE(glm::uvec2, "[{}, {}]", object.x, object.y);
 SP_FORMAT_CUSTOM_TYPE(glm::uvec3, "[{}, {}, {}]", object.x, object.y, object.z);
 
 SP_FORMAT_CUSTOM_TYPE(Soup::Event, "{}", object.ToString());
+SP_FORMAT_CUSTOM_TYPE(Soup::UUID, "{}", (uint64_t)object);
 
 namespace Soup
 {

@@ -1,7 +1,6 @@
 #include "Application.h"
 
 #include "Core/Time.h"
-#include "IO/MeshImporter.h"
 #include "Renderer/Renderer.h"
 
 namespace Soup
@@ -23,15 +22,12 @@ namespace Soup
     {
       Renderer::Shutdown();
     }
-    Renderer::Shutdown();
-    MeshImporter::Shutdown();
     ApplicationLogger::Shutdown();
   }
 
   void Application::Initialize()
   {
     ApplicationLogger::Init();
-    MeshImporter::Init();
     Renderer::Init(RendererAPI::API::OpenGL);
 
     if (!m_Specs.Headless)

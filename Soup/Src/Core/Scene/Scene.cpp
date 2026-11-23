@@ -32,27 +32,27 @@ namespace Soup
     return entity;
   }
 
-  Entity Scene::CreateMeshEntity(Ref<Mesh> mesh)
+  Entity Scene::CreateMeshEntity(AssetHandle assetHandle)
   {
-    return CreateMeshEntity(mesh, glm::vec3(0.0f), RendererMaterial());
+    return CreateMeshEntity(assetHandle, glm::vec3(0.0f), RendererMaterial());
   }
 
-  Entity Scene::CreateMeshEntity(Ref<Mesh> mesh, const glm::vec3& position)
+  Entity Scene::CreateMeshEntity(AssetHandle assetHandle, const glm::vec3& position)
   {
-    return CreateMeshEntity(mesh, position, RendererMaterial());
+    return CreateMeshEntity(assetHandle, position, RendererMaterial());
   }
 
-  Entity Scene::CreateMeshEntity(Ref<Mesh> mesh, const RendererMaterial& material)
+  Entity Scene::CreateMeshEntity(AssetHandle assetHandle, const RendererMaterial& material)
   {
-    return CreateMeshEntity(mesh, glm::vec3(0.0f), material);
+    return CreateMeshEntity(assetHandle, glm::vec3(0.0f), material);
   }
 
-  Entity Scene::CreateMeshEntity(Ref<Mesh> mesh, const glm::vec3& position, const RendererMaterial& material)
+  Entity Scene::CreateMeshEntity(AssetHandle assetHandle, const glm::vec3& position, const RendererMaterial& material)
   {
     Entity entity = CreatePositionableEntity();
     entity.GetComponent<TransformComponent>().Translation = position;
 
-    entity.AddComponent<MeshComponent>(mesh);
+    entity.AddComponent<MeshComponent>(assetHandle);
     entity.AddComponent<MaterialComponent>(material);
 
     return entity;

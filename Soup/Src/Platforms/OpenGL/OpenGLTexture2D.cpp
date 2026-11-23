@@ -10,53 +10,18 @@
 namespace Soup
 {
 
-  OpenGLTexture2D::OpenGLTexture2D(const Texture2DSpecifications& specs, const std::filesystem::path& filePath)
+  OpenGLTexture2D::OpenGLTexture2D(const Texture2DSpecifications& specs, void* data)
     : m_Specs(specs)
-  {
-    void* imageData = nullptr;
-    if (std::filesystem::exists(filePath))
-    {
-      std::string strPath = filePath.string();
-      int width, height;
-      switch (m_Specs.Format)
-      {
-        case TextureFormat::RGB8:
-        case TextureFormat::RGBA8:
-          imageData = (void*)stbi_load(strPath.c_str(), &width, &height, nullptr, 0);
-          break;
-        case TextureFormat::RGBFloat16:
-        case TextureFormat::RGBFloat32:
-          imageData = (void*)stbi_loadf(strPath.c_str(), &width, &height, nullptr, 0);
-          break;
-        default:
-          SP_ASSERT(false, "Unsupported pixel format!");
-          break;
-      }
-      SP_ASSERT(imageData, "Unable to load image data from {}", filePath.string());
-
-      m_Width = width;
-      m_Height = height;
-      Invalidate(imageData);
-
-      stbi_image_free(imageData);
-    }
-  }
-
-  OpenGLTexture2D::OpenGLTexture2D(const Texture2DSpecifications& specs, uint32_t width, uint32_t height, void* data)
-    : m_Specs(specs)
-    , m_Width(width)
-    , m_Height(height)
   {
     Invalidate(data);
   }
 
-  Ref<OpenGLTexture2D> OpenGLTexture2D::Copy(
-    const Texture2DSpecifications& specs, uint32_t textureSource, uint32_t width, uint32_t height)
+  Ref<OpenGLTexture2D> OpenGLTexture2D::Copy(const Texture2DSpecifications& specs, uint32_t textureSource)
   {
-    Ref<OpenGLTexture2D> texture = CreateRef<OpenGLTexture2D>(specs, width, height);
+    Ref<OpenGLTexture2D> texture = CreateRef<OpenGLTexture2D>(specs);
 
-    glCopyImageSubData(
-      textureSource, GL_TEXTURE_2D, 0, 0, 0, 0, texture->m_TextureID, GL_TEXTURE_2D, 0, 0, 0, 0, width, height, 1);
+    glCopyImageSubData(textureSource, GL_TEXTURE_2D, 0, 0, 0, 0, texture->m_TextureID, GL_TEXTURE_2D, 0, 0, 0, 0,
+      specs.Width, specs.Height, 1);
 
     return texture;
   }
@@ -74,13 +39,13 @@ namespace Soup
 
   void OpenGLTexture2D::Resize(uint32_t width, uint32_t height)
   {
-    if (m_Width == width && m_Height == height)
+    if (m_Specs.Width == width && m_Specs.Height == height)
     {
       return;
     }
 
-    m_Width = width;
-    m_Height = height;
+    m_Specs.Width = width;
+    m_Specs.Height = height;
     Invalidate(nullptr);
   }
 
@@ -98,7 +63,7 @@ namespace Soup
     GLint internalFormat = OpenGLTextureUtils::TextureFormatToOpenGLTextureInternalFormat(m_Specs.Format);
     GLint format = OpenGLTextureUtils::TextureFormatToOpenGLTextureFormat(m_Specs.Format);
     GLint type = OpenGLTextureUtils::TextureFormatToOpenGLTextureType(m_Specs.Format);
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_Width, m_Height, 0, format, type, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_Specs.Width, m_Specs.Height, 0, format, type, data);
 
     GLint wrapSParam = OpenGLTextureUtils::TextureWrapModeToOpenGLWrapMode(m_Specs.WrappingModeU);
     GLint wrapTParam = OpenGLTextureUtils::TextureWrapModeToOpenGLWrapMode(m_Specs.WrappingModeV);
@@ -120,17 +85,17 @@ namespace Soup
       return 0;
     }
 
-    if (x < 0 || x >= m_Width || y < 0 || y >= m_Height)
+    if (x < 0 || x >= m_Specs.Width || y < 0 || y >= m_Specs.Height)
     {
       SP_LOG_ERROR("Pixel coordinates are out of bonds. Returning 0.");
       return 0;
     }
 
-    int32_t* pixelData = new int32_t[m_Width * m_Height];
+    int32_t* pixelData = new int32_t[m_Specs.Width * m_Specs.Height];
     glBindTexture(GL_TEXTURE_2D, m_TextureID);
     glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_INT, pixelData);
 
-    int32_t pixelValue = pixelData[y * m_Width + x];
+    int32_t pixelValue = pixelData[y * m_Specs.Width + x];
     delete[] pixelData;
     return pixelValue;
   }

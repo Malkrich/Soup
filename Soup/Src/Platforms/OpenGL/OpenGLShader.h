@@ -17,8 +17,6 @@ namespace Soup
     virtual void Bind() const override;
     virtual void Unbind() const override;
 
-    virtual void Reload(const std::filesystem::path& filePath) override { Invalidate(filePath); }
-
     virtual void SetBool(const std::string& name, bool data) override;
     virtual void SetFloat3(const std::string& name, const glm::vec3& data) override;
     virtual void SetMat4(const std::string& name, const glm::mat4& data) override;

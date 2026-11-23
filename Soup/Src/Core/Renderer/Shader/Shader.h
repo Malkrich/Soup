@@ -27,8 +27,6 @@ namespace Soup
     virtual void Bind() const = 0;
     virtual void Unbind() const = 0;
 
-    virtual void Reload(const std::filesystem::path& filePath) = 0;
-
     virtual void SetBool(const std::string& name, bool data) = 0;
     virtual void SetFloat3(const std::string& name, const glm::vec3& data) = 0;
     virtual void SetMat4(const std::string& name, const glm::mat4& data) = 0;

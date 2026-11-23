@@ -3,7 +3,6 @@
 #include "GpuMesh.h"
 #include "Primitives.h"
 #include "RenderPass.h"
-#include "RendererMaterial.h"
 #include "Shader/Shader.h"
 #include "Shader/ShaderLibrary.h"
 #include "Texture2D.h"
